@@ -84,13 +84,13 @@ export const NavLinks = () => {
                 </ListItemIcon>
                 <ListItemText primary="Log out" />
             </ListItemButton>}
-            {!session && <ListItemButton onClick={redirectToLogin} >
+            {!session && <ListItemButton onClick={()=>handleRedirect("/login")} >
                 <ListItemIcon>
                     <LoginIcon />
                 </ListItemIcon>
                 <ListItemText primary="Log in" />
             </ListItemButton>}
-            {!session && <ListItemButton onClick={()=>redirect("/signup")}>
+            {!session && <ListItemButton onClick={()=>handleRedirect("/signup")}>
                 <ListItemIcon>
                     <PersonAddIcon />
                 </ListItemIcon>
