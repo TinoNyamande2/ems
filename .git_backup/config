@@ -1,0 +1,14 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[user]
+	name = TinoNyamande2
+	email = tinotenda.nyamande4@gmail.com
+	password = icu2i4cu@0777T
+[remote "origin"]
+	url = git@github-second:TinoNyamande2/Store-App.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
