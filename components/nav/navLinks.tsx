@@ -37,13 +37,13 @@ export const NavLinks = () => {
 
     return (
         <List component="nav">
-            {!session && <ListItemButton onClick={()=>handleRedirect("/")}>
+            {session && <ListItemButton onClick={()=>handleRedirect("/")}>
                 <ListItemIcon>
                     <DashboardIcon />
                 </ListItemIcon>
                 <ListItemText primary="Dashboard" />
             </ListItemButton>}
-            {!session && <ListItemButton onClick={()=>handleRedirect("/dashboard/leave-applications")}>
+            {session && <ListItemButton onClick={()=>handleRedirect("/dashboard/leave-applications")}>
                 <ListItemIcon>
                     <FlightIcon />
                 </ListItemIcon>
