@@ -1,87 +1,22 @@
-"use client"
-import "./../globals.css"
-import AddWorkItemModal from "../../../components/workitemmodal";
-import { Dayjs } from 'dayjs';
+import * as React from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
-
-// pages/work-items.tsx
-import React, { useState } from 'react';
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, differenceInMinutes, addWeeks, subWeeks } from 'date-fns';
-import { Button, Container, Typography } from '@mui/material';
-
-interface WorkItem {
-  day: Date;
-  startTime: Dayjs;
-  endTime: Dayjs;
-  project: string;
-  totalHours: number;
-}
-
-const WorkItems: React.FC = () => {
-  const [workItems, setWorkItems] = useState<WorkItem[]>([]);
-  const [currentWeek, setCurrentWeek] = useState<Date>(new Date());
-  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
-  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
-
-  const startOfWeekDate = startOfWeek(currentWeek, { weekStartsOn: 1 });
-  const endOfWeekDate = endOfWeek(currentWeek, { weekStartsOn: 1 });
-
-  const daysOfWeek = eachDayOfInterval({ start: startOfWeekDate, end: endOfWeekDate }).filter(
-    (day) => day.getDay() !== 0 && day.getDay() !== 6
-  );
-
-  const handleAddItem = (project: string, startTime: Dayjs, endTime: Dayjs) => {
-    if (selectedDay) {
-      const totalHours = differenceInMinutes(new Date(endTime.toISOString()),new Date(startTime.toISOString())) / 60;
-      //const totalHours = 10
-      const newItem: WorkItem = { day: selectedDay, project, startTime, endTime, totalHours };
-      setWorkItems([...workItems, newItem]);
-    }
-  };
-
-  const handlePreviousWeek = () => {
-    setCurrentWeek(subWeeks(currentWeek, 1));
-  };
-
-  const handleNextWeek = () => {
-    setCurrentWeek(addWeeks(currentWeek, 1));
-  };
-
+export default function Page() {
   return (
-    <Container>
-      <Typography variant="h4" component="h1" gutterBottom>Employee Work Items</Typography>
-      <div>
-        <Button variant="contained" onClick={handlePreviousWeek} sx={{ marginRight: 2 }}>Previous Week</Button>
-        <Button variant="contained" onClick={handleNextWeek}>Next Week</Button>
-      </div>
-      <div>
-        {daysOfWeek.map((day) => (
-          <div key={day.toISOString()} className='day'>
-            <Typography variant="h6" component="h2">{format(day, 'EEEE, MMM d, yyyy')}</Typography>
-            <Button variant="contained" onClick={() => { setSelectedDay(day); setModalIsOpen(true); }}>
-              Add Item
-            </Button>
-            <ul>
-              {workItems
-                .filter((item) => item.day.toDateString() === day.toDateString())
-                .map((item, index) => (
-                  <li key={index}>
-                    {item.project}: {item.startTime.format('HH:mm')} - {item.endTime.format("HH:mm")} ({item.totalHours.toFixed(2)} hours)
-                  </li>
-                ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-      {selectedDay && (
-        <AddWorkItemModal
-          isOpen={modalIsOpen}
-          onRequestClose={() => setModalIsOpen(false)}
-          onAddItem={handleAddItem}
-        />
-      )}
-    </Container>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh', // Full viewport height
+        width: '100%', // Full width
+      }}
+    >
+      <CircularProgress size={80} /> {/* Increase the size of the spinner */}
+      <Typography sx={{ mt: 2,fontSize:"1.5em" }}>Loading ...</Typography> {/* Add margin-top for spacing */}
+    </Box>
   );
-};
-
-export default WorkItems;
+}

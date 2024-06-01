@@ -2,21 +2,32 @@ import { getAllNewApplication, getApplicationByUsername } from "@/data/leaveappl
 import { QueryResultRow } from "@vercel/postgres";
 import { useState, useEffect } from "react";
 import LeaveTable from "./tabledata";
+import { NoDataFound } from "../../../components/NoDataFound";
+import { useQuery } from "react-query";
+import { CircularProgressSpinner } from "../../../components/CircularProgress";
+import { ErrorOccured } from "../../../components/ErrorOccured";
 
 export default function Approve () {
     
     const [applications, setApplications] = useState<QueryResultRow[] | null>(null);
+    const getApplications = ()=>getAllNewApplication();
+    const { data, isError, isLoading ,error} = useQuery([ 'new-leave-applications'],getApplications,);
     useEffect(() => {
-        const getData = async () => {
-                const data = await getAllNewApplication();
-                setApplications(data);
-            
-        }
-        getData();
-    }, [])
+        if (!isLoading && data) {
+            setApplications(data);
+          }
+    }, [data,isLoading])
+    if(isLoading) {
+         return <CircularProgressSpinner message="Loading Applications"/>
+    }
+    if (isError) {
+        return (
+            <ErrorOccured message={(error as Error).message} />
+        )
+    }
     return (
         <>
-        {applications ? (<LeaveTable applications={applications}/>):(<p>No data found</p>)}
+        {applications && !isLoading ? (<LeaveTable applications={applications}/>):(<NoDataFound message={"There are currentl no applications pending approval"}/>)}
         
         </>
     )

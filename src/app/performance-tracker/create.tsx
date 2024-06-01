@@ -38,7 +38,6 @@ const WorkItems: React.FC = () => {
   const handleAddItem = (project: string, startTime: Dayjs, endTime: Dayjs, tags: string, summary: string) => {
     if (selectedDay) {
       const totalHours = differenceInMinutes(new Date(endTime.toISOString()), new Date(startTime.toISOString())) / 60;
-      //const totalHours = 10
       const newItem: WorkItem = { day: selectedDay, project, startTime, endTime, totalHours, tags, summary };
       const performance: PerfomanceCreate = {
         date: selectedDay.toISOString(),

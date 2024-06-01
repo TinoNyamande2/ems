@@ -42,14 +42,14 @@ export const CreateLeaveApplicationForm = async (
 };
 export const ApproveApplication = async (id: string) => {
   try {
-    sql`UPDATE leaveapplication SET status = 'APPROVED' WHERE id = ${id}`;
+    sql`UPDATEs leaveapplication SET status = 'APPROVED' WHERE id = ${id}`;
   } catch (error) {
     throw new Error(error as string);
   }
 };
 export const RejectApplication = async (id: string) => {
   try {
-    sql`UPDATE leaveapplication SET status = 'REJECT' WHERE id = ${id}`;
+    sql`UPDATEs s leaveapplication SET status = 'REJECT' WHERE id = ${id}`;
   } catch (error) {
     throw new Error(error as string);
   }
@@ -68,7 +68,7 @@ export const getApplicationByUsername = async (username: string|null|undefined) 
   try {
     if(username) {
       const data =
-      await sql`SELECT * FROM leaveapplication WHERE id=${username} `;
+      await sql`SELECT * FROM leaveapplication WHERE username=${username} `;
       return data.rows;
     } else {
       throw new Error("Username cannot be null")

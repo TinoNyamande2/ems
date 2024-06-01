@@ -10,11 +10,16 @@ const bcrypt = require('bcrypt')
     const hashedPassword = await bcrypt.hash(user.password,10)
     await sql`INSERT INTO users (name,email,password) 
     VALUES (${user.name},${user.email},${hashedPassword})`
-  } catch (error: any) {
-    console.log(error);
+  } catch (error) {
+    throw new Error((error as Error).message);
   }
 };
 
-export const UserLogin = async(user:User) =>{
-
+export const getUserByEmail = async (email:string|null|undefined) => {
+  try {
+    const data = sql`SELECT * FROM users WHERE email=${email}`
+    return (await data).rows[0]
+  }catch (error) {
+    throw new Error((error as Error).message);
+  }
 }

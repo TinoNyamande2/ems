@@ -1,19 +1,27 @@
 "use client"
 
 import { Box, Button } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Apply from "./apply";
 import Applications from "./applications";
 import Approve from "./approve";
 import Overview from "./overview";
+import { SessionProvider, signIn, signOut, useSession } from "next-auth/react"
+import {redirect} from 'next/navigation'
+import { getUserByEmail } from "@/data/user";
+import { useQuery } from "react-query";
+import { QueryResultRow } from "@vercel/postgres";
+import { CircularProgressSpinner } from "../../../components/CircularProgress";
+
+
 
 export default function Page () {
     const [applySelected, setApplySelected] = useState(false);
     const [applicationsSelected, setApplicationsSelected] = useState(true);
     const [approveSelected, setApproveSelected] = useState(false);
     const [overviewSelected, setOverviewSelected] = useState(false);
+    const [user,setUser] = useState<QueryResultRow|undefined>(undefined);
     const handleApplySelected = () => {
-        console.log("Clicked")
         setApplySelected(true);
         setApplicationsSelected(false);
         setApproveSelected(false);
@@ -37,6 +45,29 @@ export default function Page () {
         setApproveSelected(false);
         setOverviewSelected(true);
     }
+    const { data: session } = useSession();
+    const useremail = session?.user?.email;
+  
+    if(!session) {
+      redirect("/login")
+    }
+    const fetchUser = () => getUserByEmail(useremail);
+
+    const { data, isError, isLoading } = useQuery(
+      [useremail],
+      fetchUser,
+      {
+        enabled: !!useremail,
+      }
+    );
+    useEffect(()=>{
+        if(!isLoading) {
+            setUser(data);
+        }
+    },[session,isLoading,data])
+  if(isLoading) {
+    return <CircularProgressSpinner message="Loading"/>
+  }
 
     return (
         <Box>
@@ -47,9 +78,9 @@ export default function Page () {
                 <Button size="small" onClick={handleApplySelected} fullWidth sx={{
                     ...(applySelected && { backgroundColor: "blue", color: "white" }),
                 }}>Apply</Button>
-                <Button size="small" onClick={handleApproveSelected} fullWidth sx={{
+                {user?.role=='admin' && !isLoading && <Button size="small" onClick={handleApproveSelected} fullWidth sx={{
                     ...(approveSelected && { backgroundColor: "blue", color: "white" }),
-                }}>Approve Applications</Button>
+                }}>Approve Applications</Button>}
                 <Button size="small" onClick={handleOverviewSelected} fullWidth sx={{
                     ...(overviewSelected && { backgroundColor: "blue", color: "white" }),
                 }}>Overview</Button>

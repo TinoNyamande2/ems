@@ -16,14 +16,11 @@ export const getPerformanceFromWeekByUsername = (username:string) =>{
 
 }
 export const getPerformanceForDayByUsername = async (username:string|null|undefined,date:string) =>{
-  console.log("Searching")
       try {
-        console.log(username)
-        console.log(date);
-        const data = await sql`SELECT * FROM performance WHERE username=${username} AND date=${date}`
-        console.log(data.rowCount);
+        
+        const converteddate = new Date(date);
+        const data = await sql`SELECT * FROM performance WHERE username=${username} AND date=${converteddate.toISOString()}`
         return data.rows
-        console.log(data);
       }catch (error) {
         throw new Error((error as Error).message);
       }
