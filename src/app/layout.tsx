@@ -17,6 +17,9 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { SessionWrapper } from '../../components/sessionWrapper';
 import { NavLinks } from '../../components/nav/navLinks';
+import { QueryClientProvider, QueryClient } from "react-query";
+
+const queryClient = new QueryClient()
 
 function Copyright(props: any) {
   return (
@@ -91,86 +94,88 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <SessionWrapper>
-      <html>
-        <body>
-          <ThemeProvider theme={defaultTheme}>
-            <Box sx={{ display: 'flex' }}>
-              <CssBaseline />
-              <AppBar position="absolute" open={open}>
-                <Toolbar
-                  sx={{
-                    pr: '24px', // keep right padding when drawer closed
-                  }}
-                >
-                  <IconButton
-                    edge="start"
-                    color="inherit"
-                    aria-label="open drawer"
-                    onClick={toggleDrawer}
+    <QueryClientProvider client={queryClient}>
+      <SessionWrapper>
+        <html>
+          <body>
+            <ThemeProvider theme={defaultTheme}>
+              <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <AppBar position="absolute" open={open}>
+                  <Toolbar
                     sx={{
-                      marginRight: '36px',
-                      ...(open && { display: 'none' }),
+                      pr: '24px', // keep right padding when drawer closed
                     }}
                   >
-                    <MenuIcon />
-                  </IconButton>
-                  <Typography
-                    component="h1"
-                    variant="h6"
-                    color="inherit"
-                    noWrap
-                    sx={{ flexGrow: 1 }}
+                    <IconButton
+                      edge="start"
+                      color="inherit"
+                      aria-label="open drawer"
+                      onClick={toggleDrawer}
+                      sx={{
+                        marginRight: '36px',
+                        ...(open && { display: 'none' }),
+                      }}
+                    >
+                      <MenuIcon />
+                    </IconButton>
+                    <Typography
+                      component="h1"
+                      variant="h6"
+                      color="inherit"
+                      noWrap
+                      sx={{ flexGrow: 1 }}
+                    >
+                      Employee Management System
+                    </Typography>
+                    <IconButton color="inherit">
+                      <Badge badgeContent={4} color="secondary">
+                        <NotificationsIcon />
+                      </Badge>
+                    </IconButton>
+                  </Toolbar>
+                </AppBar>
+                <Drawer variant="permanent" open={open}>
+                  <Toolbar
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                      px: [1],
+                    }}
                   >
-                    Employee Management System
-                  </Typography>
-                  <IconButton color="inherit">
-                    <Badge badgeContent={4} color="secondary">
-                      <NotificationsIcon />
-                    </Badge>
-                  </IconButton>
-                </Toolbar>
-              </AppBar>
-              <Drawer variant="permanent" open={open}>
-                <Toolbar
+                    <IconButton onClick={toggleDrawer}>
+                      <ChevronLeftIcon />
+                    </IconButton>
+                  </Toolbar>
+                  <Divider />
+                  <NavLinks />
+                </Drawer>
+                <Box
+                  component="main"
                   sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                    px: [1],
+                    backgroundColor: (theme) =>
+                      theme.palette.mode === 'light'
+                        ? theme.palette.grey[100]
+                        : theme.palette.grey[900],
+                    flexGrow: 1,
+                    height: '100vh',
+                    overflow: 'auto',
                   }}
                 >
-                  <IconButton onClick={toggleDrawer}>
-                    <ChevronLeftIcon />
-                  </IconButton>
-                </Toolbar>
-                <Divider />
-                <NavLinks />
-              </Drawer>
-              <Box
-                component="main"
-                sx={{
-                  backgroundColor: (theme) =>
-                    theme.palette.mode === 'light'
-                      ? theme.palette.grey[100]
-                      : theme.palette.grey[900],
-                  flexGrow: 1,
-                  height: '100vh',
-                  overflow: 'auto',
-                }}
-              >
-                <Toolbar />
-                <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                  {children}
-                  <Copyright sx={{ pt: 4 }} />
-                </Container>
+                  <Toolbar />
+                  <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                    {children}
+                    <Copyright sx={{ pt: 4 }} />
+                  </Container>
+                </Box>
               </Box>
-            </Box>
-          </ThemeProvider>
-        </body>
+            </ThemeProvider>
+          </body>
+        </html>
+      </SessionWrapper>
+    </QueryClientProvider>
 
-      </html>
-    </SessionWrapper>
 
 
   );

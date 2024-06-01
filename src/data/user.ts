@@ -8,8 +8,8 @@ export const AddUser = async (user: User) => {
 const bcrypt = require('bcrypt')
   try {
     const hashedPassword = await bcrypt.hash(user.password,10)
-    await sql`INSERT INTO users (fullname,email,password) 
-    VALUES (${user.fullname},${user.email},${hashedPassword})`
+    await sql`INSERT INTO users (name,email,password) 
+    VALUES (${user.name},${user.email},${hashedPassword})`
   } catch (error: any) {
     console.log(error);
   }

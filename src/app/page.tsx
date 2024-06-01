@@ -17,9 +17,9 @@ export default  function Home() {
 
  const { data: session } = useSession();
   
-  // if(!session) {
-  //   redirect("/login")
-  // }
+  if(!session) {
+    redirect("/login")
+  }
 
   return (
     <Grid container spacing={3}>

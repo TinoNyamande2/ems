@@ -2,15 +2,13 @@
 import "./../globals.css"
 import { Dayjs } from 'dayjs';
 import AddWorkItemModal from "../../../components/workitemmodal";
-
-
-// pages/work-items.tsx
 import React, { useState } from 'react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, differenceInMinutes, addWeeks, subWeeks } from 'date-fns';
-import { Button, Container, Typography } from '@mui/material';
+import { Button, Container, Typography,Box } from '@mui/material';
 import { addPerformance } from "@/data/perfomance";
 import { PerfomanceCreate } from "@/interfaces/performance";
 import { useSession } from "next-auth/react";
+import { WorkItemsPerDay } from "../../../components/workItemsPerDay";
 
 interface WorkItem {
   day: Date;
@@ -50,9 +48,8 @@ const WorkItems: React.FC = () => {
         totalhours: totalHours.toString(),
         tags: tags,
         summary: summary,
-        username:session?.user?.name
+        username: session?.user?.name
       }
-      console.log(newItem)
       try {
         addPerformance(performance)
         setWorkItems([...workItems, newItem]);
@@ -85,7 +82,10 @@ const WorkItems: React.FC = () => {
             <Button variant="contained" onClick={() => { setSelectedDay(day); setModalIsOpen(true); }}>
               Add Item
             </Button>
-            <ul>
+            <Box>
+              <WorkItemsPerDay date={day.toDateString()} />
+            </Box>
+            {/* <ul>
               {workItems
                 .filter((item) => item.day.toDateString() === day.toDateString())
                 .map((item, index) => (
@@ -93,7 +93,7 @@ const WorkItems: React.FC = () => {
                     {item.project}: {item.startTime.format('HH:mm')} - {item.endTime.format("HH:mm")} ({item.totalHours.toFixed(2)} hours)
                   </li>
                 ))}
-            </ul>
+            </ul> */}
           </div>
         ))}
       </div>

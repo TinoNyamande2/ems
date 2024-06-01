@@ -69,6 +69,8 @@ export const authOptions: NextAuthOptions = {
     },
       
     async signIn({ user, account, profile, email, credentials }) {
+      console.log(user)
+      console.log(credentials)
       if (account?.provider === 'google') {
         // Check if the user already exists in the database
         const data = await sql`SELECT * FROM users WHERE email=${user.email} LIMIT 1`;

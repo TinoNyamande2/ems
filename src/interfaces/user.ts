@@ -1,11 +1,11 @@
 export interface User {
-    fullname :string,
+    name :string,
     email:string,
     password:string
 }
 
-export const UserDefaultValues = {
-    fullname :"",
+export const UserDefaultValues :User = {
+    name :"",
     email:"",
     password:""
 }

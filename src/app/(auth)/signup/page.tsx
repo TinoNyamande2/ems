@@ -14,16 +14,14 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { getServerSession } from 'next-auth';
+import { signIn, signOut, useSession } from "next-auth/react"
 import { authOptions } from '../../../../lib/authOptions';
 import {redirect} from 'next/navigation'
 import { UserDefaultValues ,User} from '@/interfaces/user';
 import { ChangeEvent } from 'react';
 import { AddUser } from '@/data/user';
-import { useSession } from 'next-auth/react';
 
 
-
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default  function SignUp() {
@@ -64,10 +62,10 @@ export default  function SignUp() {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  name="fullname"
+                  name="name"
                   required
                   fullWidth
-                  id="fullame"
+                  id="name"
                   label="Full Name"
                   onChange={handleChange}
                   autoFocus
@@ -110,6 +108,9 @@ export default  function SignUp() {
             >
               Sign Up
             </Button>
+            <Button fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }} onClick={() => signIn('google')} >Continue with Google</Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link href="/login" variant="body2">
