@@ -2,11 +2,11 @@
 import Image from "next/image";
 import { Box, Grid, Paper, Typography } from "@mui/material"
 import { useEffect } from "react";
-import Dashboard from "./Dashboard"
+import Dashboard from "./defaultcomponents/Dashboard"
 import { ProductsContainer } from "../../components/products/productsContainer";
-import Chart from "./Chart";
-import Deposits from "./Deposits";
-import Orders from "./Orders";
+import Chart from "./defaultcomponents/Chart";
+import Deposits from "./defaultcomponents/Deposits";
+import Orders from "./defaultcomponents/Orders";
 import { getServerSession } from 'next-auth';
 import {redirect} from 'next/navigation'
 import { authOptions } from "../../lib/authOptions";

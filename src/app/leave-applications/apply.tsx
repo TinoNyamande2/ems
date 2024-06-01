@@ -2,7 +2,7 @@
 import { LeaveApplicationCreate, LeaveApplicationCreateDefaultValues } from '@/interfaces/leaveapplications';
 import React, { ChangeEvent, SyntheticEvent, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import "./../../globals.css"
+import "./../globals.css"
 import { CreateLeaveApplicationForm } from '@/data/leaveapplications';
 
 export default function LeaveForm() {

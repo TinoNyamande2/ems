@@ -129,6 +129,18 @@ body {
   border-radius: 8px;
 }
 
+/* styles/work-items.module.css */
+.container {
+  padding: 20px;
+}
+
+.day {
+  margin-bottom: 20px;
+}
+
+button {
+  margin-top: 10px;
+}
 
 
 

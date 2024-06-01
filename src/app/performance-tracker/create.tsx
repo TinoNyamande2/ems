@@ -1,13 +1,16 @@
 "use client"
 import "./../globals.css"
-import AddWorkItemModal from "../../../components/workitemmodal";
 import { Dayjs } from 'dayjs';
+import AddWorkItemModal from "../../../components/workitemmodal";
 
 
 // pages/work-items.tsx
 import React, { useState } from 'react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, differenceInMinutes, addWeeks, subWeeks } from 'date-fns';
 import { Button, Container, Typography } from '@mui/material';
+import { addPerformance } from "@/data/perfomance";
+import { PerfomanceCreate } from "@/interfaces/performance";
+import { useSession } from "next-auth/react";
 
 interface WorkItem {
   day: Date;
@@ -15,6 +18,8 @@ interface WorkItem {
   endTime: Dayjs;
   project: string;
   totalHours: number;
+  tags: string;
+  summary: string;
 }
 
 const WorkItems: React.FC = () => {
@@ -22,6 +27,8 @@ const WorkItems: React.FC = () => {
   const [currentWeek, setCurrentWeek] = useState<Date>(new Date());
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const { data: session } = useSession();
+
 
   const startOfWeekDate = startOfWeek(currentWeek, { weekStartsOn: 1 });
   const endOfWeekDate = endOfWeek(currentWeek, { weekStartsOn: 1 });
@@ -30,12 +37,29 @@ const WorkItems: React.FC = () => {
     (day) => day.getDay() !== 0 && day.getDay() !== 6
   );
 
-  const handleAddItem = (project: string, startTime: Dayjs, endTime: Dayjs) => {
+  const handleAddItem = (project: string, startTime: Dayjs, endTime: Dayjs, tags: string, summary: string) => {
     if (selectedDay) {
-      const totalHours = differenceInMinutes(new Date(endTime.toISOString()),new Date(startTime.toISOString())) / 60;
+      const totalHours = differenceInMinutes(new Date(endTime.toISOString()), new Date(startTime.toISOString())) / 60;
       //const totalHours = 10
-      const newItem: WorkItem = { day: selectedDay, project, startTime, endTime, totalHours };
-      setWorkItems([...workItems, newItem]);
+      const newItem: WorkItem = { day: selectedDay, project, startTime, endTime, totalHours, tags, summary };
+      const performance: PerfomanceCreate = {
+        date: selectedDay.toISOString(),
+        project: project,
+        starttime: startTime.toISOString(),
+        endtime: endTime.toISOString(),
+        totalhours: totalHours.toString(),
+        tags: tags,
+        summary: summary,
+        username:session?.user?.name
+      }
+      console.log(newItem)
+      try {
+        addPerformance(performance)
+        setWorkItems([...workItems, newItem]);
+      } catch (error) {
+        console.log(error)
+      }
+
     }
   };
 
