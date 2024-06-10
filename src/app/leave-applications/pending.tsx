@@ -44,7 +44,7 @@ export default function PendingApplications() {
                 <Typography sx={{ fontWeight: "bold", fontSize: "1.6em", textAlign: "center" }} >My Pending Applications</Typography>
             </Box>
             {applications && applications?.length > 0 && !isLoading ? (<PendingLeaveTableDetails applications={applications} />
-            ) : (<NoDataFound message={"You dont have any pending leave applicatios"} />)}
+            ) : (<NoDataFound message={"You dont have any pending leave applicatios"} />) }
         </>
     )
 }

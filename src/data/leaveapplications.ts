@@ -211,7 +211,7 @@ export const getLeaveDaysGroupedByUser = async ()=>{
 }
 export const getLeaveDaysGroupedByLeaveType = async ()=>{
   try {
-    const data = await sql`SELECT leavetype ,SUM(CAST(a.totaldays AS DOUBLE PRECISION))AS value FROM leaveapplication   GROUP BY leavetype`
+    const data = await sql`SELECT leavetype ,SUM(CAST(totaldays AS DOUBLE PRECISION))AS value FROM leaveapplication   GROUP BY leavetype`
     return data.rows;
 }catch (error) {
  throw new Error(error as string);
@@ -221,13 +221,15 @@ export const getLeaveDaysGroupedByLeaveType = async ()=>{
 export const getFilteredApplications = async (user:string|undefined|null,leavetype:string|undefined|null) =>{
   try {
         if(user && leavetype) {
-          const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email WHERE leavetype ILIKE ${`%${leavetype}%`} AND user ILIKE ${`%${user}%`} `
+          const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email WHERE a.leavetype ILIKE ${`%${leavetype}%`} AND b.name ILIKE ${`%${user}%`} `
           return data.rows;
         } else   if(!user && leavetype) {
-          const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email WHERE leavetype ILIKE${`%${leavetype}%`} `
+          console.log("Fetching")
+          const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email WHERE a.leavetype ILIKE ${`%${leavetype}%`} `
+          console.log(data)
           return data.rows;
         }else   if(user && !leavetype) {
-          const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email WHERE user ILIKE ${`%${user}%`}  `
+          const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email WHERE b.name ILIKE ${`%${user}%`}  `
           return data.rows;
         }else  {
           const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email `

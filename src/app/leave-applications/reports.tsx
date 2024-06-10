@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-import LeaveTable, { LeaveTableDetails, LeaveTableReport, LeaveTableReportGrouped } from "./tabledata"
+import LeaveTable, { LeaveTableDetails, LeaveTableReport, LeaveTableReportGrouped, LeaveTableReportGroupedByLeaveType } from "./tabledata"
 import { QueryResultRow } from "@vercel/postgres"
 import { getApplicationByUsername } from "@/data/leaveapplications";
 import { useSession } from "next-auth/react";
@@ -31,9 +31,9 @@ export default function LeaveReports() {
             <Box>
                 <Search placeholder="" />
             </Box>
-            {user || leavetype &&  <LeaveTableReport user={user} leavetype={leavetype} />}
+            {user || leavetype && groupBy =="None" &&  <LeaveTableReport user={user} leavetype={leavetype} />}
             {groupBy == "user" && <LeaveTableReportGrouped  />}
-            {groupBy == "leavetype" &&  <LeaveTableReportGrouped />}
+            {groupBy == "leavetype" &&  <LeaveTableReportGroupedByLeaveType />}
 
         </>
     )
