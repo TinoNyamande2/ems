@@ -26,7 +26,6 @@ export default function Applications() {
     useEffect(() => {
         if (!isLoading && data) {
             setApplications(data);
-            console.log(data)
         }
     }, [session, data, isLoading])
     if (isLoading) {

@@ -3,10 +3,11 @@ import {
   LeaveApplicationCreate,
   LeaveApplicationEdit,
 } from "@/interfaces/leaveapplications";
-import { sql } from "@vercel/postgres";
+import { QueryResultRow, sql } from "@vercel/postgres";
+import { createNotification } from "./notification";
+import { NotificationCreate } from "@/interfaces/notification";
 
 const getWeekdaysBetweenDates = (startDate: Date, endDate: Date): number => {
-  // Make sure the start date is earlier than the end date
   if (startDate > endDate) {
     throw new Error("Start date must be earlier than end date");
   }
@@ -34,22 +35,53 @@ export const CreateLeaveApplicationForm = async (
         VALUES (${application.applicationdate} ,${application.username} , ${application.startdate},
             ${application.enddate},${application.leavetype} , ${totalDays}, ${application.status}
         ) `;
+    const message = `You have a new leave application from ${application.username} `
+    const notification:NotificationCreate = {
+      date:application.applicationdate,
+      from:application.username,
+      to:"tinotenda.nyamande4@gmail.com",
+      message:message,
+      read:false,
+      applicationid:"",
+    }
+    await createNotification(notification);
     
         
   } catch (error) {
     throw new Error(error as string);
   }
 };
-export const ApproveApplication = async (id: string) => {
+export const ApproveApplication = async (application: QueryResultRow|undefined) => {
   try {
-    sql`UPDATE leaveapplication SET status = 'APPROVED' WHERE id = ${id}`;
+   
+    sql`UPDATE leaveapplication SET status = 'APPROVED' WHERE id = ${application?.id}`;
+    const message = `Your  application for ${application?.leavetype} leave has been approved  `
+    const notification:NotificationCreate = {
+      date:new Date().toISOString(),
+      to:application?.username,
+      from:"tinotenda.nyamande4@gmail.com",
+      message:message,
+      read:false,
+      applicationid:""
+    }
+    await createNotification(notification);
   } catch (error) {
     throw new Error(error as string);
   }
 };
-export const RejectApplication = async (id: string) => {
+export const RejectApplication = async (application: QueryResultRow|undefined) => {
   try {
-    sql`UPDATE leaveapplication SET status = 'REJECT' WHERE id = ${id}`;
+    sql`UPDATE leaveapplication SET status = 'REJECT' WHERE id = ${application?.id}`;
+    const message = `Your  application for  ${application?.leavetype} leave has been rejected  `
+    const notification:NotificationCreate = {
+      date:new Date().toISOString(),
+      to:application?.username,
+      from:"tinotenda.nyamande4@gmail.com",
+      message:message,
+      read:false,
+      applicationid:""
+    }
+    await createNotification(notification);
   } catch (error) {
     throw new Error(error as string);
   }
@@ -139,7 +171,7 @@ export const editLeaveApplication = async (
 };
 export const getLatestApplications = async () =>{
   try {
-       const data = await sql`SELECT * FROM leaveapplication a JOIN users b ON a.username = b.email WHERE TO_DATE(startdate,'YYYY-MM-DD') >CURRENT_DATE AND status='APPROVED'   ORDER BY TO_DATE(startdate,'YYYY-MM-DD') LIMIT 10`
+       const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email WHERE TO_DATE(startdate,'YYYY-MM-DD') >CURRENT_DATE AND status='APPROVED'   ORDER BY TO_DATE(startdate,'YYYY-MM-DD') LIMIT 10`
        return data.rows;
   }catch (error) {
     throw new Error(error as string);
@@ -148,7 +180,7 @@ export const getLatestApplications = async () =>{
 
 export const getOnLeaveApplications = async () =>{
   try {
-       const data = await sql`SELECT * FROM leaveapplication a JOIN users b ON a.username = b.email WHERE TO_DATE(startdate,'YYYY-MM-DD') < CURRENT_DATE AND TO_DATE(enddate,'YYYY-MM-DD') > CURRENT_DATE AND status='APPROVED' ORDER BY TO_DATE(startdate,'YYYY-MM-DD')`
+       const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email WHERE TO_DATE(startdate,'YYYY-MM-DD') < CURRENT_DATE AND TO_DATE(enddate,'YYYY-MM-DD') > CURRENT_DATE AND status='APPROVED' ORDER BY TO_DATE(startdate,'YYYY-MM-DD')`
        return data.rows;
   }catch (error) {
     throw new Error(error as string);
@@ -165,6 +197,43 @@ export const editApplication = async (application:LeaveApplicationEdit) =>{
   try {
     const totalDays = getWeekdaysBetweenDates( new Date(application.startdate),new Date(application.enddate))
     sql`UPDATE leaveapplication SET leavetype=${application.leavetype} ,startdate=${application.startdate}, enddate=${application.enddate},totaldays=${totalDays} WHERE id =${application.id}`
+  }catch (error) {
+    throw new Error(error as string);
+  }
+}
+export const getLeaveDaysGroupedByUser = async ()=>{
+  try {
+    const data = await sql`SELECT b.name ,SUM(CAST(a.totaldays AS DOUBLE PRECISION))AS value FROM leaveapplication a JOIN users b ON a.username = b.email  GROUP BY b.name`
+    return data.rows;
+}catch (error) {
+ throw new Error(error as string);
+}
+}
+export const getLeaveDaysGroupedByLeaveType = async ()=>{
+  try {
+    const data = await sql`SELECT leavetype ,SUM(CAST(a.totaldays AS DOUBLE PRECISION))AS value FROM leaveapplication   GROUP BY leavetype`
+    return data.rows;
+}catch (error) {
+ throw new Error(error as string);
+}
+}
+
+export const getFilteredApplications = async (user:string|undefined|null,leavetype:string|undefined|null) =>{
+  try {
+        if(user && leavetype) {
+          const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email WHERE leavetype ILIKE ${`%${leavetype}%`} AND user ILIKE ${`%${user}%`} `
+          return data.rows;
+        } else   if(!user && leavetype) {
+          const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email WHERE leavetype ILIKE${`%${leavetype}%`} `
+          return data.rows;
+        }else   if(user && !leavetype) {
+          const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email WHERE user ILIKE ${`%${user}%`}  `
+          return data.rows;
+        }else  {
+          const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email `
+          return data.rows;
+        }
+      
   }catch (error) {
     throw new Error(error as string);
   }

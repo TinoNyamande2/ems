@@ -12,8 +12,8 @@ export const CircularProgressSpinner=({message}:{message:string})=> {
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      height: '100vh', // Full viewport height
-      width: '100%', // Full width
+      height: '100vh', 
+      width: '100%', 
     }}
   >
     <CircularProgress size={80} /> {/* Increase the size of the spinner */}
@@ -29,17 +29,27 @@ export const SmallCircularProgressSpinner=({message}:{message:string})=> {
   return (
     <Box
     sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '50vh', // Full viewport height
-      width: '50%', // Full width
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '40vh', 
     }}
-  >
-    <CircularProgress size={80} /> {/* Increase the size of the spinner */}
-    <Typography sx={{ mt: 2,fontSize:"1.5em" }}>Loading ...</Typography> {/* Add margin-top for spacing */}
-  </Box>
+>
+    <Box
+        sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '30vh', 
+            width: '30%',
+            textAlign: 'center', 
+        }}
+    >
+        <CircularProgress size={40} /> 
+        <Typography sx={{ mt: 2, fontSize: "0.9em" }}>Loading ...</Typography> {/* Add margin-top for spacing */}
+    </Box>
+</Box>
 
 
   )

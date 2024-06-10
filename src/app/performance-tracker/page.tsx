@@ -84,7 +84,7 @@ export default function Page () {
                 }} >Tracker</Button>
                 <Button size="small" onClick={handleReportsSelected} fullWidth sx={{
                     ...(reportsSelected && { backgroundColor: "blue", color: "white" }),
-                }}>Reports</Button>
+                }}>Summary</Button>
                                {user?.role =='admin' && !isLoading &&  <Button size="small" onClick={handleOverviewSelected} fullWidth sx={{
                     ...(overviewSelected && { backgroundColor: "blue", color: "white" }),
                 }}>Overview</Button>}

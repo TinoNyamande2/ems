@@ -38,7 +38,7 @@ export default function Page({ params }: { params: { id: string } }) {
     const onReject = async () => {
         setIsSaving(true);
         try {
-            await RejectApplication(id);
+            await RejectApplication(application);
             setWarningToastOpen(true);
             setTimeout(() => {
                 router.push("/leave-applications");
@@ -55,7 +55,7 @@ export default function Page({ params }: { params: { id: string } }) {
     const onApprove = async () => {
         setIsSaving(true);
         try {
-            await ApproveApplication(id);
+            await ApproveApplication(application);
             setOpen(true);
             setTimeout(() => {
                 router.push("/leave-applications");

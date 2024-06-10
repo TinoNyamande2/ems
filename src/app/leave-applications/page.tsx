@@ -14,6 +14,7 @@ import { QueryResultRow } from "@vercel/postgres";
 import { CircularProgressSpinner } from "../../../components/CircularProgress";
 import { alpha } from '@mui/material';
 import PendingApplications from "./pending";
+import LeaveReports from "./reports";
 
 
 
@@ -23,31 +24,47 @@ export default function Page () {
     const [applicationsSelected, setApplicationsSelected] = useState(true);
     const [approveSelected, setApproveSelected] = useState(false);
     const [pendingSelected, setPendingSelected] = useState(false);
+    const [reportsSelected, setReportsSelected] = useState(false);
     const [user,setUser] = useState<QueryResultRow|undefined>(undefined);
     const handleApplySelected = () => {
         setApplySelected(true);
         setApplicationsSelected(false);
         setApproveSelected(false);
         setPendingSelected(false);
+        setReportsSelected(false)
     }
     const handleApplicationsSelected = () => {
         setApplySelected(false);
         setApplicationsSelected(true);
         setApproveSelected(false);
         setPendingSelected(false);
+        setReportsSelected(false)
+
     }
     const handleApproveSelected = () => {
         setApplySelected(false);
         setApplicationsSelected(false);
         setApproveSelected(true);
         setPendingSelected(false);
+        setReportsSelected(false)
+
     }
     const handlePendingSelected = () => {
         setApplySelected(false);
         setApplicationsSelected(false);
         setApproveSelected(false);
         setPendingSelected(true);
+        setReportsSelected(false)
+
     }
+    const handleReportsSelected = () => {
+      setApplySelected(false);
+      setApplicationsSelected(false);
+      setApproveSelected(false);
+      setPendingSelected(false);
+      setReportsSelected(true)
+
+  }
     const { data: session } = useSession();
     const useremail = session?.user?.email;
   
@@ -107,15 +124,21 @@ export default function Page () {
                 {user?.role=='admin' && !isLoading && <Button size="small" onClick={handleApproveSelected} fullWidth sx={{
                     ...(approveSelected && { backgroundColor: "blue", color: "white" }),
                 }}>Approve Applications</Button>}
-                <Button size="small" onClick={handlePendingSelected} fullWidth sx={{
+                {user?.role=='admin' && !isLoading && <Button size="small" onClick={handleReportsSelected} fullWidth sx={{
+                    ...(reportsSelected && { backgroundColor: "blue", color: "white" }),
+                }}>Reports</Button>}
+                {user?.role !='admin' && !isLoading && <Button size="small" onClick={handleApproveSelected} fullWidth sx={{
                     ...(pendingSelected && { backgroundColor: "blue", color: "white" }),
-                }}>Pending Applications</Button>
+                }}>Pending Applications</Button>}
+            
             </Box>
             <Box sx={{marginTop:"3vh"}}>
                 {applicationsSelected && <Applications/>}
                 {applySelected && <Apply/>}
                 {approveSelected && <Approve />}
                 {pendingSelected && <PendingApplications />}
+                {reportsSelected && <LeaveReports />}
+
             </Box>
         </Box>
     )

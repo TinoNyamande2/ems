@@ -12,7 +12,7 @@ export default function Page({ params }: { params: { id: string } }) {
     return (
         <Box>
             <Box sx={{ marginTop: "3vh" }}>
-                <Typography sx={{ fontWeight: "bold", fontSize: "1.6em", textAlign: "center" }} >{id} </Typography>F
+                <Typography sx={{ fontWeight: "bold", fontSize: "1.6em", textAlign: "center" }} >{id} </Typography>
             </Box>            
             <ProjectsTable id={id} />
         </Box>

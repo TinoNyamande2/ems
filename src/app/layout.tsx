@@ -164,7 +164,6 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                   <Toolbar />
                   <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                     {children}
-                    <Copyright sx={{ pt: 4 }} />
                   </Container>
                 </Box>
               </Box>

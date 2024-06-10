@@ -22,6 +22,7 @@ export const ProjectsTable = ({ id }: { id: string }) => {
     const [returnedData, setReturnedData] = useState<QueryResultRow[] | undefined>(undefined)
 
     useEffect(() => {
+        console.log(id)
         if (!isLoading && data) {
             setProjectData(data);
             console.log(data)
@@ -47,7 +48,7 @@ export const ProjectsTable = ({ id }: { id: string }) => {
 
 
     if (isLoading) {
-        return <CircularProgressSpinner message="Loading Applications" />
+        return <CircularProgressSpinner message="Loading Data" />
     }
     if (isError) {
         return (
@@ -65,7 +66,7 @@ export const ProjectsTable = ({ id }: { id: string }) => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Users</TableCell>
+                            <TableCell></TableCell>
                             <TableCell>Total Hours</TableCell>
                             <TableCell>Percentage</TableCell>
                         </TableRow>

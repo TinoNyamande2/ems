@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
 import { QueryResultRow } from '@vercel/postgres';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {format} from "date-fns"
+import { getFilteredApplications, getLeaveDaysGroupedByUser } from '@/data/leaveapplications';
+import { useQuery } from 'react-query';
 
 
 
@@ -156,5 +158,114 @@ export const OnLeaveTableForDashboard = ({applications}:{applications:QueryResul
   );
 };
 
+export const LeaveTableReport = ({user,leavetype}:{user:string,leavetype:string}) => {
+  const [applications,setApplications] = useState<QueryResultRow|undefined>(undefined)
+  const {data,isLoading} = useQuery(["report",user,leavetype],()=>getFilteredApplications(user,leavetype))
+  useEffect(()=>{
+    if(!isLoading) {
+          setApplications(data)
+    }
+  })
+  return (
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Start Date</TableCell>
+            <TableCell>End Date</TableCell>
+            <TableCell>Total Days</TableCell>
+            <TableCell>Leave Type</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Application Date</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {applications?.map((leave:any) => (
+            <TableRow key={leave.id}>
+              <TableCell>{format(leave.startdate,"EEEE dd MMMM yyyy")}</TableCell>
+              <TableCell>{format(leave.enddate,"EEEE dd MMMM yyyy")}</TableCell>
+              <TableCell>{leave.totaldays}</TableCell>
+              <TableCell>{leave.leavetype}</TableCell>
+              <TableCell>{leave.status}</TableCell>
+              <TableCell>{format(leave.applicationdate,"EEEE dd MMMM yyyy")}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
+export const LeaveTableReportGrouped = () => {
+  const [applications,setApplications] = useState<QueryResultRow|undefined>(undefined)
+  const {data,isLoading} = useQuery(["report","users"],()=>getLeaveDaysGroupedByUser())
+  useEffect(()=>{
+    if(!isLoading) {
+          setApplications(data)
+    }
+  })
+  return (
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>User</TableCell>
+            <TableCell>Total Days</TableCell>
+            <TableCell>Total Days</TableCell>
+            <TableCell>Leave Type</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Application Date</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {applications?.map((leave:any) => (
+            <TableRow key={leave.id}>
+              <TableCell>{leave.name}</TableCell>
+              <TableCell>{leave.totaldays}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
+export const LeaveTableReportGroupedByLeaveType = () => {
+  const [applications,setApplications] = useState<QueryResultRow|undefined>(undefined)
+  const {data,isLoading} = useQuery(["report","leave type"],()=>getLeaveDaysGroupedByUser())
+  useEffect(()=>{
+    if(!isLoading) {
+          setApplications(data)
+    }
+  })
+  return (
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>User</TableCell>
+            <TableCell>Total Days</TableCell>
+            <TableCell>Total Days</TableCell>
+            <TableCell>Leave Type</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Application Date</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {applications?.map((leave:any) => (
+            <TableRow key={leave.id}>
+              <TableCell>{leave.name}</TableCell>
+              <TableCell>{leave.totaldays}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+  
+};
+
+
 
 export default LeaveTable;
+
+
+

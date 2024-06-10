@@ -15,6 +15,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import LatestApplications, { OnLeaveApplications } from "../../components/latestLeaveApplications";
+import { Notifications } from "../../components/Notifications";
 
 
 export default function Home() {
@@ -118,12 +119,13 @@ export default function Home() {
             <Typography sx={{ textAlign: "center", fontSize: "1.5em" }} >Upcoming leave days</Typography>
             <LatestApplications />
           </Box>
-          <Box sx={{ marginBottom: "5vh" }}>
+          <Box sx={{ marginBottom: "5vh" }} >
             <Typography sx={{ textAlign: "center", fontSize: "1.5em" }} >Employees On Leave</Typography>
             <OnLeaveApplications />
           </Box>
-          <Box>
+          <Box sx={{ marginBottom: "5vh" }} >
             <Typography sx={{ textAlign: "center", fontSize: "1.5em" }}>Notifications</Typography>
+            <Notifications/>
           </Box>
         </Box>
       </Container>
