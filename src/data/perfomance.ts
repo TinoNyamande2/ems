@@ -13,7 +13,20 @@ export const addPerformance = async (performance: PerfomanceCreate) => {
     throw new Error((error as Error).message);
   }
 };
-export const getPerformanceFromWeekByUsername = (username: string) => {};
+export const getPerformanceByUsername = async(username: string|undefined|null) => {
+  
+  try {
+    const data = await sql`SELECT * FROM performance a
+                             JOIN projects b
+                             ON a.project::uuid = b.id
+                            JOIN tags c
+                             ON a.tags::uuid= c.id
+                            WHERE username=${username} `;
+    return data.rows;
+  } catch (error) {
+    throw new Error((error as Error).message);
+  }
+};
 export const getPerformanceForDayByUsername = async (
   username: string | null | undefined,
   date: string
@@ -52,28 +65,47 @@ export const getAllPerformanceFromPeriod = async (
     throw new Error((error as Error).message);
   }
 };
-export const getHoursPerProject = async (startDate: string, endDate: string) => {
+export const getHoursPerProject = async (
+  startDate: string,
+  endDate: string,
+  groupBy: string
+) => {
+  
   try {
     const convertedStartdate = new Date(startDate);
     const convertedEnddate = new Date(endDate);
-    const data = await sql`
-      SELECT b.projectname as label, SUM(CAST(totalhours AS INTEGER)) AS value, b.id
+    if (groupBy == "User") {
+      const data = await sql`
+      SELECT b.name as label, SUM(CAST(totalhours AS DOUBLE PRECISION))AS value, b.id
+      FROM performance a
+      JOIN users b ON a.username = b.email
+      WHERE a.date > ${convertedStartdate.toISOString()} AND a.date < ${convertedEnddate.toISOString()}
+      GROUP BY a.username, b.id;
+    `;
+      return data.rows;
+    } else {
+      const data = await sql`
+      SELECT b.projectname as label, SUM(CAST(totalhours AS DOUBLE PRECISION))AS value, b.id
       FROM performance a
       JOIN projects b ON a.project::uuid = b.id
       WHERE a.date > ${convertedStartdate.toISOString()} AND a.date < ${convertedEnddate.toISOString()}
       GROUP BY b.projectname, b.id;
     `;
-    return data.rows;
+      return data.rows;
+    }
   } catch (error) {
     throw new Error((error as Error).message);
   }
 };
-export const getHoursPerProjectTable = async (startDate: string, endDate: string) => {
+export const getHoursPerProjectTable = async (
+  startDate: string,
+  endDate: string
+) => {
   try {
     const convertedStartdate = new Date(startDate);
     const convertedEnddate = new Date(endDate);
     const data = await sql`
-      SELECT b.projectname as label, SUM(CAST(totalhours AS INTEGER)) AS value 
+      SELECT b.projectname as label, SUM(CAST(totalhours AS DOUBLE PRECISION)) AS value 
       FROM performance a
       JOIN projects b ON a.project::uuid = b.id
       WHERE a.date > ${convertedStartdate.toISOString()} AND a.date < ${convertedEnddate.toISOString()}

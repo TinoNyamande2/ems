@@ -3,27 +3,35 @@ import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, Tab
 import { QueryResultRow } from "@vercel/postgres";
 import { subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
+import { CircularProgressSpinner } from "../../../components/CircularProgress";
 import { useQuery } from "react-query";
-export const PerformanceByHourtable = ({startdate,enddate}:{startdate:string,enddate:string}) =>{
+export const PerformanceByHourtable = ({startdate,enddate,groupBy}:{startdate:string,enddate:string,groupBy:string}) =>{
     const [performances, setPerformances] = useState<QueryResultRow[] | undefined>(undefined);
     const [totalHours,setTotalHours] = useState(1);
  
 
     const { data, isError, isLoading, error } = useQuery(
-        ['performances', startdate, enddate],
-        () => getHoursPerProject(startdate, enddate)
+        ['table-performances', startdate, enddate],
+        () => getHoursPerProject(startdate, enddate,groupBy)
     );
 
     useEffect(() => {
         if (!isLoading && data) {
             setPerformances(data);
+            console.log("Table",data)
             const total = data.reduce((acc, row) => acc + parseFloat(row.value), 0);
-            console.log(data)
             setTotalHours(total)
-            console.log(total)
        
         }
     }, [data, isLoading]);
+    if (isLoading) {
+        return <CircularProgressSpinner message="Loading Applications" />
+    }
+    if(isError) {
+        return (
+            <p>Error occured</p>
+        )
+    }
     return (
         <TableContainer component={Paper}>
         <Table>

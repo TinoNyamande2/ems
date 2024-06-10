@@ -24,20 +24,19 @@ const AddWorkItemModal: React.FC<AddWorkItemModalProps> = ({ isOpen, onRequestCl
     const [startTime, setStartTime] = useState<Dayjs | null>(null);
     const [endTime, setEndTime] = useState<Dayjs | null>(null);
 
-    //const { data: projectsData, isLoading: isProjectsLoading, error: projectsError, refetch: refetchProjects } = useQuery("all-projects", getAllProjects);
-   // const { data: tagsData, isLoading: isTagsLoading, error: tagsError, refetch: refetchTags } = useQuery("all-tags", getAllTags);
 
     useEffect(() => {
- const fetchProject = async () =>{
-    const data = getAllProjects();
-    setProjectsList(await data);
- }
- const fetchTags = async () =>{
-    const data = getAllTags();
-    console.log(data)
-    setTagsList(await data);
- }
-  
+        const fetchProject = async () => {
+            const data = getAllProjects();
+            setProjectsList(await data);
+            console.log("Project",data)
+        }
+        const fetchTags = async () => {
+            const data = getAllTags();
+            console.log("tags",data)
+            setTagsList(await data);
+        }
+
         fetchProject();
         fetchTags();
     }, []);

@@ -129,9 +129,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                       Employee Management System
                     </Typography>
                     <IconButton color="inherit">
-                      <Badge badgeContent={4} color="secondary">
-                        <NotificationsIcon />
-                      </Badge>
+                      
                     </IconButton>
                   </Toolbar>
                 </AppBar>

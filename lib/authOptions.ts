@@ -24,25 +24,27 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        console.log("Logging in");
+        if(!credentials?.email) {
+          throw new Error("Email is required");
+        }
+        if(!credentials?.email) {
+          throw new Error("Password is required");
+        }
         const data = await sql`SELECT * FROM users WHERE email=${credentials?.email} LIMIT 1`;
         if (!data || data.rowCount === 0) {
-          console.log("User not found");
-          return null;
+          throw new Error("User not found");
         }
         const user = data.rows[0];
         const bcrypt = require("bcrypt")
         const passwordCorrect = await bcrypt.compare(credentials?.password, user.password);
         if (passwordCorrect) {
-          console.log("Correct password");
           return {
             id: user.id,
             name: user.name,
             email: user.email,
           };
         } else {
-          console.log("Incorrect password");
-          return null;
+          throw new Error("Incorrect password");
         }
       },
     }),
@@ -69,15 +71,10 @@ export const authOptions: NextAuthOptions = {
     },
       
     async signIn({ user, account, profile, email, credentials }) {
-      console.log(user)
-      console.log(credentials)
       if (account?.provider === 'google') {
-        // Check if the user already exists in the database
         const data = await sql`SELECT * FROM users WHERE email=${user.email} LIMIT 1`;
         if (data.rowCount === 0) {
-          // If user does not exist, insert a new user record
           await sql`INSERT INTO users (name, email) VALUES (${user.name}, ${user.email})`;
-          console.log("New user created");
         } else {
           console.log("User already exists");
         }

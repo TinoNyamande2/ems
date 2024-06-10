@@ -42,14 +42,14 @@ export const CreateLeaveApplicationForm = async (
 };
 export const ApproveApplication = async (id: string) => {
   try {
-    sql`UPDATEs leaveapplication SET status = 'APPROVED' WHERE id = ${id}`;
+    sql`UPDATE leaveapplication SET status = 'APPROVED' WHERE id = ${id}`;
   } catch (error) {
     throw new Error(error as string);
   }
 };
 export const RejectApplication = async (id: string) => {
   try {
-    sql`UPDATEs s leaveapplication SET status = 'REJECT' WHERE id = ${id}`;
+    sql`UPDATE leaveapplication SET status = 'REJECT' WHERE id = ${id}`;
   } catch (error) {
     throw new Error(error as string);
   }
@@ -57,7 +57,7 @@ export const RejectApplication = async (id: string) => {
 export const getApplicationById = async (id: string) => {
   try {
     const data =
-      await sql`SELECT * FROM leaveapplication WHERE id=${id} LIMIT 1`;
+      await sql`SELECT * FROM leaveapplication  WHERE id=${id} LIMIT 1`;
     return data.rows[0];
   } catch (error) {
     throw new Error(error as string);
@@ -68,7 +68,7 @@ export const getApplicationByUsername = async (username: string|null|undefined) 
   try {
     if(username) {
       const data =
-      await sql`SELECT * FROM leaveapplication WHERE username=${username} `;
+      await sql`SELECT * FROM leaveapplication a JOIN users b ON a.username = b.email WHERE username=${username} `;
       return data.rows;
     } else {
       throw new Error("Username cannot be null")
@@ -80,7 +80,7 @@ export const getApplicationByUsername = async (username: string|null|undefined) 
 };
 export const getAllApplications = async () => {
   try {
-    const data = await sql`SELECT * FROM leaveapplication`;
+    const data = await sql`SELECT * FROM leaveapplication a JOIN users b ON a.username = b.email`;
     return data.rows;
   } catch (error) {
     throw new Error(error as string);
@@ -89,7 +89,7 @@ export const getAllApplications = async () => {
 
 export const getAllNewApplication = async () => {
   try {
-    const data = await sql`SELECT * FROM leaveapplication WHERE status='NEW'`;
+    const data = await sql`SELECT a.id ,b.name , a.username , a.startdate , a.enddate , a.totaldays , a.leavetype , a.applicationdate FROM leaveapplication a JOIN users b ON a.username = b.email WHERE status='NEW'`;
     return data.rows;
   } catch (error) {
     throw new Error(error as string);
@@ -98,7 +98,7 @@ export const getAllNewApplication = async () => {
 export const getAllApprovedApplication = async () => {
   try {
     const data =
-      await sql`SELECT * FROM leaveapplication WHERE status='APPROVED'`;
+      await sql`SELECT * FROM leaveapplication a JOIN users b ON a.username = b.email WHERE status='APPROVED'`;
     return data.rows;
   } catch (error) {
     throw new Error(error as string);
@@ -107,7 +107,7 @@ export const getAllApprovedApplication = async () => {
 export const getAllRejectedApplication = async () => {
   try {
     const data =
-      await sql`SELECT * FROM leaveapplication WHERE status='REJECTED'`;
+      await sql`SELECT * FROM leaveapplication a JOIN users b ON a.username = b.email WHERE status='REJECTED'`;
     return data.rows;
   } catch (error) {
     throw new Error(error as string);
@@ -120,6 +120,14 @@ export const editLeaveApplication = async (
     await sql`UPDATE leaveapplication SET startdate=${application.startdate} , enddate=${application.enddate},
        totaldays=${application.totaldays}`;
   } catch (error) {
-    throw new Error(error as string);
+    throw new Error(error as string); 
   }
 };
+export const getLatestApplications = async () =>{
+  try {
+       const data = await sql`SELECT * FROM leaveapplication a JOIN users b ON a.username = b.email WHERE TO_DATE(startdate,'YYYY-MM-DD') >CURRENT_DATE ORDER BY TO_DATE(startdate,'YYYY-MM-DD')  LIMIT 10`
+       return data.rows;
+  }catch (error) {
+    throw new Error(error as string);
+  }
+}

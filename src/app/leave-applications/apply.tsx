@@ -40,7 +40,6 @@ export default function LeaveForm() {
       setOpen(true)
       setFormData(LeaveApplicationCreateDefaultValues);
     } catch (error) {
-      console.log(error)
       setErrorSavingData((error as Error).message)
       setErrorToastOpen(true)
     } finally {
@@ -53,11 +52,10 @@ export default function LeaveForm() {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setFormData((prevInputs) => ({ ...prevInputs, [event.target.name]: event.target.value }))
     setErrors(LeaveApplicationCreateDefaultValues);
-    setFormData((prevInputs) => ({ ...prevInputs, ['username']: session?.user?.name }));
+    setFormData((prevInputs) => ({ ...prevInputs, ['username']: session?.user?.email }));
     setFormData((prevInputs) => ({ ...prevInputs, ['applicationdate']: new Date().toISOString() }))
     setFormData((prevInputs) => ({ ...prevInputs, ['status']: 'NEW' }))
-    console.log(event.target.name);
-    console.log(event.target.value)
+
   };
   const handleLeaveTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setFormData((prevInputs) => ({ ...prevInputs, [event.target.name]: event.target.value }))

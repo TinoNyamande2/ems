@@ -7,6 +7,10 @@ import {sql} from "@vercel/postgres"
 export const AddUser = async (user: User) => {
 const bcrypt = require('bcrypt')
   try {
+    const userExists = await sql`SELECT * FROM users WHERE email=${user.email}`
+    if(userExists.rowCount >0) {
+      throw new Error("User already exists")
+    }
     const hashedPassword = await bcrypt.hash(user.password,10)
     await sql`INSERT INTO users (name,email,password) 
     VALUES (${user.name},${user.email},${hashedPassword})`

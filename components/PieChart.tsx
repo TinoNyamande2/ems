@@ -16,8 +16,8 @@ export const CustomPieChart = ({data}:{data:ProjectGraph[]}) =>{
           data: data,
         },
       ]}
-      width={400}
-      height={200}
+      width={800}
+      height={300}
     />
   );
 }

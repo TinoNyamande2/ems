@@ -4,7 +4,7 @@ import { Box, Button } from "@mui/material";
 import { useState } from "react";
 import WorkItems from "./create";
 import Reports from "./reports";
-import { Overview } from "./overview";
+import  Overview  from "./overview";
 
 export default function Page () {
     const [trackerSelected, setTrackerSelected] = useState(true);

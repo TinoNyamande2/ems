@@ -4,6 +4,7 @@ import { QueryResultRow } from "@vercel/postgres";
 import { useEffect,useState } from "react";
 import { useQuery } from "react-query"
 import { CustomPieChart } from "../../../components/PieChart";
+import { CircularProgressSpinner, SmallCircularProgressSpinner } from "../../../components/CircularProgress";
 
 interface ProjectGraph {
     id:string,
@@ -11,13 +12,14 @@ interface ProjectGraph {
     value:number
 }
 
-export const PerformancePieChart = ({ startdate, enddate }: { startdate: string, enddate: string }) => {
+export const PerformancePieChart = ({ startdate, enddate,groupBy }: { startdate: string, enddate: string;groupBy:string }) => {
     const [performanceData, setPerformanceData] = useState<ProjectGraph[]>([])
     const [returnedData , setReturnedData] = useState<QueryResultRow[]|undefined>(undefined)
-    const { data, isLoading, error } = useQuery(["pie-data", startdate, enddate], () => getHoursPerProject(startdate, enddate));
+    const { data, isLoading, error } = useQuery(["pie-data", startdate, enddate], () => getHoursPerProject(startdate, enddate,groupBy));
 
     useEffect(() => {
         if (!isLoading && data) {
+            console.log("Pie",data)
             setReturnedData(data)
             if(returnedData) {
 
@@ -31,6 +33,9 @@ export const PerformancePieChart = ({ startdate, enddate }: { startdate: string,
             
         }
     },[isLoading,data,returnedData])
+    if (isLoading) {
+        return <SmallCircularProgressSpinner message="Loading Data" />
+    }
     return (
         <>
       {performanceData.length > 0 ? <CustomPieChart data={performanceData} /> : <p>No data available</p>}

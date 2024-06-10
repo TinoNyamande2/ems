@@ -85,7 +85,7 @@ export default function Page () {
                     ...(overviewSelected && { backgroundColor: "blue", color: "white" }),
                 }}>Overview</Button>
             </Box>
-            <Box>
+            <Box sx={{marginTop:"3vh"}}>
                 {applicationsSelected && <Applications/>}
                 {applySelected && <Apply/>}
                 {approveSelected && <Approve />}

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { format } from 'date-fns';
 
-export const WorkItemsPerDay = ({ date }: { date: string }) => {
+export const WorkItemsPerDay = ({ date,refetchTrigger }: { date: string,refetchTrigger:number }) => {
   const { data: session } = useSession();
   const [workItems, setWorkItems] = useState<QueryResultRow[] | undefined>(undefined);
 
@@ -14,7 +14,7 @@ export const WorkItemsPerDay = ({ date }: { date: string }) => {
 
   const fetchPerformance = () => getPerformanceForDayByUsername(username, date);
 
-  const { data, isError, isLoading } = useQuery(
+  const { data, isError, isLoading,refetch } = useQuery(
     [username, date],
     fetchPerformance,
     {
@@ -25,9 +25,14 @@ export const WorkItemsPerDay = ({ date }: { date: string }) => {
   useEffect(() => {
     if (!isLoading && data) {
       setWorkItems(data);
-      console.log(data)
     }
-  }, [isLoading, data]);
+  }, [isLoading, data,refetchTrigger]);
+
+  useEffect(() => {
+    if (refetchTrigger > 0) {
+      refetch();
+    }
+  }, [refetchTrigger]);
 
   return (
     <Box>

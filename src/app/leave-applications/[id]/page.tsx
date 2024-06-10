@@ -24,10 +24,10 @@ export default function Page({ params }: { params: { id: string } }) {
     const { data, isLoading, isError, error } = useQuery(['application', id], () => getApplicationById(id));
 
     useEffect(() => {
-        if (data) {
+        if (!isLoading) {
             setApplication(data);
         }
-    }, [data]);
+    }, [data,isLoading]);
 
     const handleClick = () => {
         setOpen(false);
@@ -61,7 +61,6 @@ export default function Page({ params }: { params: { id: string } }) {
                 router.push("/leave-applications");
             }, 3000);
         } catch (error) {
-            console.error('Error approving application:', error); // Log the error
             setErrorSavingData((error as Error).message);
             setErrorToastOpen(true);
         } finally {

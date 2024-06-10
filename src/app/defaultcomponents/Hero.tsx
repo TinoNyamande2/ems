@@ -9,7 +9,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-export default function Page() {
+export default function Hero() {
   return (
     <Box
       id="hero"
@@ -28,11 +28,11 @@ export default function Page() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          pt: { xs: 14, sm: 6 },
-          pb: { xs: 8, sm: 6 },
+          pt: { xs: 14, sm: 20 },
+          pb: { xs: 8, sm: 12 },
         }}
       >
-        <Stack spacing={2} useFlexGap sx={{ width: { xs: '100%', sm: '90%' } }}>
+        <Stack spacing={2} useFlexGap sx={{ width: { xs: '100%', sm: '70%' } }}>
           <Typography
             variant="h1"
             sx={{
@@ -43,7 +43,7 @@ export default function Page() {
               fontSize: 'clamp(3.5rem, 10vw, 4rem)',
             }}
           >
-            Employee Management System&nbsp;
+            Our latest&nbsp;
             <Typography
               component="span"
               variant="h1"
@@ -53,19 +53,18 @@ export default function Page() {
                   theme.palette.mode === 'light' ? 'primary.main' : 'primary.light',
               }}
             >
+              products
             </Typography>
           </Typography>
-          <Box
+          <Typography
             textAlign="center"
             color="text.secondary"
-            display='flex'
-            flexDirection="row"
-            width="100%"
             sx={{ alignSelf: 'center', width: { sm: '100%', md: '80%' } }}
           >
-            <Link style={{flex:"1"}} href="/leave-applications"><Button variant="outlined" fullWidth>Apply for leave</Button></Link>
-            <Link style={{flex:"1"}} href="/performance-tracker"><Button variant="outlined"  fullWidth>Performance Tracker</Button></Link>
-          </Box>
+            Explore our cutting-edge dashboard, delivering high-quality solutions
+            tailored to your needs. Elevate your experience with top-tier features
+            and services.
+          </Typography>
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             alignSelf="center"
@@ -73,12 +72,34 @@ export default function Page() {
             useFlexGap
             sx={{ pt: 2, width: { xs: '100%', sm: 'auto' } }}
           >
+            <TextField
+              id="outlined-basic"
+              hiddenLabel
+              size="small"
+              variant="outlined"
+              aria-label="Enter your email address"
+              placeholder="Your email address"
+              inputProps={{
+                autoComplete: 'off',
+                'aria-label': 'Enter your email address',
+              }}
+            />
+            <Button variant="contained" color="primary">
+              Start now
+            </Button>
           </Stack>
+          <Typography variant="caption" textAlign="center" sx={{ opacity: 0.8 }}>
+            By clicking &quot;Start now&quot; you agree to our&nbsp;
+            <Link href="#" color="primary">
+              Terms & Conditions
+            </Link>
+            .
+          </Typography>
         </Stack>
         <Box
           id="image"
           sx={(theme) => ({
-            mt: { xs: 8, sm: 2 },
+            mt: { xs: 8, sm: 10 },
             alignSelf: 'center',
             height: { xs: 200, sm: 700 },
             width: '100%',
@@ -98,14 +119,7 @@ export default function Page() {
                 ? `0 0 12px 8px ${alpha('#9CCCFC', 0.2)}`
                 : `0 0 24px 12px ${alpha('#033363', 0.2)}`,
           })}
-        >
-          <Box>
-          <Typography>Upcoming leave days</Typography>
-          </Box>
-          <Box>
-          <Typography>Notifications</Typography>
-          </Box>
-        </Box>
+        />
       </Container>
     </Box>
   );

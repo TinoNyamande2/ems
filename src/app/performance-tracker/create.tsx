@@ -26,7 +26,7 @@ const WorkItems: React.FC = () => {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const { data: session } = useSession();
-
+  const [refetchTrigger, setRefetchTrigger] = useState<number>(0);
 
   const startOfWeekDate = startOfWeek(currentWeek, { weekStartsOn: 1 });
   const endOfWeekDate = endOfWeek(currentWeek, { weekStartsOn: 1 });
@@ -51,8 +51,8 @@ const WorkItems: React.FC = () => {
       }
       try {
        addPerformance(performance)
-       console.log(performance)
         setWorkItems([...workItems, newItem]);
+        setRefetchTrigger(prev => prev + 1);
       } catch (error) {
         console.log(error)
       }
@@ -83,17 +83,8 @@ const WorkItems: React.FC = () => {
               Add Item
             </Button>
             <Box>
-              <WorkItemsPerDay date={day.toDateString()} />
+              <WorkItemsPerDay date={day.toDateString()} refetchTrigger={refetchTrigger} />
             </Box>
-            {/* <ul>
-              {workItems
-                .filter((item) => item.day.toDateString() === day.toDateString())
-                .map((item, index) => (
-                  <li key={index}>
-                    {item.project}: {item.startTime.format('HH:mm')} - {item.endTime.format("HH:mm")} ({item.totalHours.toFixed(2)} hours)
-                  </li>
-                ))}
-            </ul> */}
           </div>
         ))}
       </div>
