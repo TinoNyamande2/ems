@@ -124,7 +124,7 @@ export default function Page () {
                 {user?.role=='admin' && !isLoading && <Button size="small" onClick={handleApproveSelected} fullWidth sx={{
                     ...(approveSelected && { backgroundColor: "blue", color: "white" }),
                 }}>Approve Applications</Button>}
-                {user?.role=='admin' && !isLoading && <Button size="small" onClick={handleReportsSelected} fullWidth sx={{
+                {user?.role=='ad' && !isLoading && <Button size="small" onClick={handleReportsSelected} fullWidth sx={{
                     ...(reportsSelected && { backgroundColor: "blue", color: "white" }),
                 }}>Reports</Button>}
                 {user?.role !='admin' && !isLoading && <Button size="small" onClick={handleApproveSelected} fullWidth sx={{
