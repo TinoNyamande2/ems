@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {reactStrictMode: true,
+    transpilePackages: ['@mui/x-charts'],};
+
 
 export default nextConfig;

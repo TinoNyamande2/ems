@@ -20,8 +20,6 @@ export default function LeaveForm() {
   }
   const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
-
-    console.log(formData)
     if (!formData.startdate) {
       setErrors((prevErrors) => ({ ...prevErrors, ['startdate']: 'Start Date is required' }))
       return

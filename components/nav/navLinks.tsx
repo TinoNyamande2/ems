@@ -21,9 +21,16 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useRouter } from 'next/navigation';
+import { getUserByEmail } from "@/data/user";
+import { useQuery } from "react-query";
+import { useEffect, useState } from "react";
+import { QueryResultRow } from "@vercel/postgres";
+
 
 export const NavLinks = () => {
     const { data: session } = useSession();
+    const useremail = session?.user?.email;
+    const [user,setUser] = useState<QueryResultRow|undefined>(undefined);
 
     const redirectToLogin = () =>{
         console.log("clicked")
@@ -34,6 +41,20 @@ export const NavLinks = () => {
     const handleRedirect = (url:string) => {
       router.push(url);
     };
+    const fetchUser = () => getUserByEmail(useremail);
+
+    const { data, isError, isLoading } = useQuery(
+      [useremail],
+      fetchUser,
+      {
+        enabled: !!useremail,
+      }
+    );
+    useEffect(()=>{
+        if(!isLoading) {
+            setUser(data);
+        }
+    },[session,isLoading,data])
 
     return (
         <List component="nav">
@@ -56,11 +77,11 @@ export const NavLinks = () => {
                     </ListItemIcon>
                     <ListItemText primary="Perfomance Tracker" />
                 </ListItemButton>}
-            {session && <ListItemButton>
+            {session && user?.role=="admin" && <ListItemButton onClick={()=>handleRedirect("/settings")} >
                 <ListItemIcon>
                     <BarChartIcon />
                 </ListItemIcon>
-                <ListItemText primary="Reports" />
+                <ListItemText primary="Settings" />
             </ListItemButton>}
             {session && <Divider sx={{ my: 1 }} />}
             {session && <ListSubheader component="div" inset>
@@ -90,7 +111,7 @@ export const NavLinks = () => {
                 </ListItemIcon>
                 <ListItemText primary="Log in" />
             </ListItemButton>}
-            {!session && <ListItemButton onClick={()=>handleRedirect("/signup")}>
+            {!session && <ListItemButton onClick={()=>handleRedirect("/signup")} >
                 <ListItemIcon>
                     <PersonAddIcon />
                 </ListItemIcon>

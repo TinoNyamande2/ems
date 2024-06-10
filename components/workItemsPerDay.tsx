@@ -10,9 +10,7 @@ export const WorkItemsPerDay = ({ date }: { date: string }) => {
   const { data: session } = useSession();
   const [workItems, setWorkItems] = useState<QueryResultRow[] | undefined>(undefined);
 
-  const username = session?.user?.name;
-
-  
+  const username = session?.user?.email;
 
   const fetchPerformance = () => getPerformanceForDayByUsername(username, date);
 
@@ -26,8 +24,8 @@ export const WorkItemsPerDay = ({ date }: { date: string }) => {
 
   useEffect(() => {
     if (!isLoading && data) {
-      console.log(data);
       setWorkItems(data);
+      console.log(data)
     }
   }, [isLoading, data]);
 
@@ -35,9 +33,10 @@ export const WorkItemsPerDay = ({ date }: { date: string }) => {
     <Box>
       {workItems?.map((item) => (
         <Box key={item.id} sx={{ display: "flex", flexDirection: "row" }}>
-          <Typography sx={{fontWeight:"bold",flex:"1"}} >{item.project}</Typography>
+          <Typography sx={{fontWeight:"bold",flex:"1"}} >{item.projectname}</Typography>
+          <Typography sx={{fontWeight:"bold",flex:"1"}} >{item.tagname}</Typography>
           <Typography sx={{fontWeight:"bold",flex:"1"}} >{item.summary}</Typography>
-          <Typography sx={{fontWeight:"bold",flex:"1"}} >{format(item.starttime,"HH:mm")} - {format(item.endtime,"HH:mm")}</Typography>
+          <Typography sx={{fontWeight:"bold",flex:"1"}} >{format(item.starttime,"HH:mm a")} - {format(item.endtime,"HH:mm a")}</Typography>
           <Typography sx={{fontWeight:"bold",flex:"1"}} >{parseFloat(item.totalhours).toFixed(2)} hours</Typography>
         </Box>
       ))}

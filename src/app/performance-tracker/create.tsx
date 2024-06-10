@@ -47,10 +47,11 @@ const WorkItems: React.FC = () => {
         totalhours: totalHours.toString(),
         tags: tags,
         summary: summary,
-        username: session?.user?.name
+        username: session?.user?.email
       }
       try {
-        addPerformance(performance)
+       addPerformance(performance)
+       console.log(performance)
         setWorkItems([...workItems, newItem]);
       } catch (error) {
         console.log(error)
