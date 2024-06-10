@@ -4,7 +4,7 @@ import { QueryResultRow } from '@vercel/postgres';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {format} from "date-fns"
-import { getFilteredApplications, getLeaveDaysGroupedByUser } from '@/data/leaveapplications';
+import { getFilteredApplications, getLeaveDaysGroupedByLeaveType, getLeaveDaysGroupedByUser } from '@/data/leaveapplications';
 import { useQuery } from 'react-query';
 
 
@@ -210,17 +210,13 @@ export const LeaveTableReportGrouped = () => {
           <TableRow>
             <TableCell>User</TableCell>
             <TableCell>Total Days</TableCell>
-            <TableCell>Total Days</TableCell>
-            <TableCell>Leave Type</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Application Date</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {applications?.map((leave:any) => (
             <TableRow key={leave.id}>
               <TableCell>{leave.name}</TableCell>
-              <TableCell>{leave.totaldays}</TableCell>
+              <TableCell>{leave.value}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -230,10 +226,11 @@ export const LeaveTableReportGrouped = () => {
 };
 export const LeaveTableReportGroupedByLeaveType = () => {
   const [applications,setApplications] = useState<QueryResultRow|undefined>(undefined)
-  const {data,isLoading} = useQuery(["report","leave type"],()=>getLeaveDaysGroupedByUser())
+  const {data,isLoading} = useQuery(["report","leave type"],()=>getLeaveDaysGroupedByLeaveType())
   useEffect(()=>{
     if(!isLoading) {
           setApplications(data)
+          console.log(data)
     }
   })
   return (
@@ -243,17 +240,14 @@ export const LeaveTableReportGroupedByLeaveType = () => {
           <TableRow>
             <TableCell>User</TableCell>
             <TableCell>Total Days</TableCell>
-            <TableCell>Total Days</TableCell>
-            <TableCell>Leave Type</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Application Date</TableCell>
+            
           </TableRow>
         </TableHead>
         <TableBody>
           {applications?.map((leave:any) => (
             <TableRow key={leave.id}>
               <TableCell>{leave.name}</TableCell>
-              <TableCell>{leave.totaldays}</TableCell>
+              <TableCell>{leave.value}</TableCell>
             </TableRow>
           ))}
         </TableBody>

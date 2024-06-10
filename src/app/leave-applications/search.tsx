@@ -18,7 +18,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
     const [user, setUser] = useState<string>("")
     //const [to, setTo] = useState<string>(enddate.toISOString());
     const [groupBy, setGroupBy] = useState<string|null>("None");
-    const options = ["None","User","Leave Type"]
+    const options = ["None","user","leavetype"]
     const handleOptionsChange = (event: ChangeEvent<{}>, value: string | null) => {
         setGroupBy(value)
     }

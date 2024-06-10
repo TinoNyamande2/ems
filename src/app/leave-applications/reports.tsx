@@ -31,7 +31,7 @@ export default function LeaveReports() {
             <Box>
                 <Search placeholder="" />
             </Box>
-            {groupBy == "None" &&  <LeaveTableReport user={user} leavetype={leavetype} />}
+            {user || leavetype &&  <LeaveTableReport user={user} leavetype={leavetype} />}
             {groupBy == "user" && <LeaveTableReportGrouped  />}
             {groupBy == "leavetype" &&  <LeaveTableReportGrouped />}
 
