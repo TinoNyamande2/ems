@@ -12,6 +12,9 @@ import { getUserByEmail } from "@/data/user";
 import { useQuery } from "react-query";
 import { QueryResultRow } from "@vercel/postgres";
 import { CircularProgressSpinner } from "../../../components/CircularProgress";
+import { alpha } from '@mui/material';
+import PendingApplications from "./pending";
+
 
 
 
@@ -19,31 +22,31 @@ export default function Page () {
     const [applySelected, setApplySelected] = useState(false);
     const [applicationsSelected, setApplicationsSelected] = useState(true);
     const [approveSelected, setApproveSelected] = useState(false);
-    const [overviewSelected, setOverviewSelected] = useState(false);
+    const [pendingSelected, setPendingSelected] = useState(false);
     const [user,setUser] = useState<QueryResultRow|undefined>(undefined);
     const handleApplySelected = () => {
         setApplySelected(true);
         setApplicationsSelected(false);
         setApproveSelected(false);
-        setOverviewSelected(false);
+        setPendingSelected(false);
     }
     const handleApplicationsSelected = () => {
         setApplySelected(false);
         setApplicationsSelected(true);
         setApproveSelected(false);
-        setOverviewSelected(false); 
+        setPendingSelected(false);
     }
     const handleApproveSelected = () => {
         setApplySelected(false);
         setApplicationsSelected(false);
         setApproveSelected(true);
-        setOverviewSelected(false);
+        setPendingSelected(false);
     }
-    const handleOverviewSelected = () => {
+    const handlePendingSelected = () => {
         setApplySelected(false);
         setApplicationsSelected(false);
         setApproveSelected(false);
-        setOverviewSelected(true);
+        setPendingSelected(true);
     }
     const { data: session } = useSession();
     const useremail = session?.user?.email;
@@ -70,7 +73,30 @@ export default function Page () {
   }
 
     return (
-        <Box>
+        <Box
+        id="image"
+        sx={(theme) => ({
+          mt: { xs: 8, sm: 2 },
+          alignSelf: 'center',
+          height: { xs: 200, sm: 700 },
+          width: '100%',
+          backgroundImage:
+            theme.palette.mode === 'light'
+              ? 'url("/static/images/templates/templates-images/hero-light.png")'
+              : 'url("/static/images/templates/templates-images/hero-dark.png")',
+          backgroundSize: 'cover',
+          borderRadius: '10px',
+          outline: '1px solid',
+          outlineColor:
+            theme.palette.mode === 'light'
+              ? alpha('#BFCCD9', 0.5)
+              : alpha('#9CCCFC', 0.1),
+          boxShadow:
+            theme.palette.mode === 'light'
+              ? `0 0 12px 8px ${alpha('#9CCCFC', 0.2)}`
+              : `0 0 24px 12px ${alpha('#033363', 0.2)}`,
+        })}
+        >
             <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
                 <Button size="small" onClick={handleApplicationsSelected} fullWidth sx={{
                     ...(applicationsSelected && { backgroundColor: "blue", color: "white" }),
@@ -81,15 +107,15 @@ export default function Page () {
                 {user?.role=='admin' && !isLoading && <Button size="small" onClick={handleApproveSelected} fullWidth sx={{
                     ...(approveSelected && { backgroundColor: "blue", color: "white" }),
                 }}>Approve Applications</Button>}
-                <Button size="small" onClick={handleOverviewSelected} fullWidth sx={{
-                    ...(overviewSelected && { backgroundColor: "blue", color: "white" }),
-                }}>Overview</Button>
+                <Button size="small" onClick={handlePendingSelected} fullWidth sx={{
+                    ...(pendingSelected && { backgroundColor: "blue", color: "white" }),
+                }}>Pending Applications</Button>
             </Box>
             <Box sx={{marginTop:"3vh"}}>
                 {applicationsSelected && <Applications/>}
                 {applySelected && <Apply/>}
                 {approveSelected && <Approve />}
-                {overviewSelected && <Overview  />}
+                {pendingSelected && <PendingApplications />}
             </Box>
         </Box>
     )

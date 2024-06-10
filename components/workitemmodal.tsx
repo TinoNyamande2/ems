@@ -29,11 +29,9 @@ const AddWorkItemModal: React.FC<AddWorkItemModalProps> = ({ isOpen, onRequestCl
         const fetchProject = async () => {
             const data = getAllProjects();
             setProjectsList(await data);
-            console.log("Project",data)
         }
         const fetchTags = async () => {
             const data = getAllTags();
-            console.log("tags",data)
             setTagsList(await data);
         }
 

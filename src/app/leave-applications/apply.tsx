@@ -6,15 +6,16 @@ import "./../globals.css"
 import { CreateLeaveApplicationForm } from '@/data/leaveapplications';
 import { CircularProgressSpinner } from '../../../components/CircularProgress';
 import { ToastNotificationError, ToastNotificationSuccess } from '../../../components/ToastNotification';
+import { Box, Typography } from '@mui/material';
 
 export default function LeaveForm() {
   const [formData, setFormData] = useState<LeaveApplicationCreate>(LeaveApplicationCreateDefaultValues);
   const [errors, setErrors] = useState<LeaveApplicationCreate>(LeaveApplicationCreateDefaultValues);
   const [isSaving, setIsSaving] = useState(false)
   const [open, setOpen] = React.useState(false);
-  const [errorToastOpen,setErrorToastOpen] = useState(false)
-  const [errorSavingData,setErrorSavingData] = useState("")
-  const handleClick = () =>{
+  const [errorToastOpen, setErrorToastOpen] = useState(false)
+  const [errorSavingData, setErrorSavingData] = useState("")
+  const handleClick = () => {
     setOpen(false);
     setErrorToastOpen(false)
   }
@@ -64,10 +65,11 @@ export default function LeaveForm() {
 
   return (
     <div className="max-w-md mx-auto mt-8">
-      <ToastNotificationSuccess message={"Application Saved Successfully"} isOpen={open} handleClick={handleClick} duration={3000}/>
-      <ToastNotificationError message={errorSavingData} isOpen={errorToastOpen} handleClick={handleClick} duration={9000}/>
-      <h1 className="text-2xl font-bold mb-4">Leave Application Form</h1>
-      {isSaving ? (<div className="absolute inset-0 flex justify-center items-center bg-opacity-50 bg-gray-500 z-50">
+      <ToastNotificationSuccess message={"Application Saved Successfully"} isOpen={open} handleClick={handleClick} duration={3000} />
+      <ToastNotificationError message={errorSavingData} isOpen={errorToastOpen} handleClick={handleClick} duration={9000} />
+      <Box sx={{ marginTop: "3vh" }}>
+        <Typography sx={{ fontWeight: "bold", fontSize: "1.6em", textAlign: "center" }} >Apply For Leave</Typography>
+      </Box>      {isSaving ? (<div className="absolute inset-0 flex justify-center items-center bg-opacity-50 bg-gray-500 z-50">
         <CircularProgressSpinner message='Saving' />
       </div>) : (
         <form onSubmit={handleSubmit}>

@@ -32,10 +32,7 @@ export const NavLinks = () => {
     const useremail = session?.user?.email;
     const [user,setUser] = useState<QueryResultRow|undefined>(undefined);
 
-    const redirectToLogin = () =>{
-        console.log("clicked")
-        redirect("/login")
-    }
+    
     const router = useRouter();
 
     const handleRedirect = (url:string) => {

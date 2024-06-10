@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { format } from 'date-fns';
+import Link from "next/link";
 
 export const WorkItemsPerDay = ({ date,refetchTrigger }: { date: string,refetchTrigger:number }) => {
   const { data: session } = useSession();
@@ -38,7 +39,7 @@ export const WorkItemsPerDay = ({ date,refetchTrigger }: { date: string,refetchT
     <Box>
       {workItems?.map((item) => (
         <Box key={item.id} sx={{ display: "flex", flexDirection: "row" }}>
-          <Typography sx={{fontWeight:"bold",flex:"1"}} >{item.projectname}</Typography>
+          <Link style={{flex:"1"}} href={`/performance-tracker/${item.id}`}> {item.projectname}</Link>
           <Typography sx={{fontWeight:"bold",flex:"1"}} >{item.tagname}</Typography>
           <Typography sx={{fontWeight:"bold",flex:"1"}} >{item.summary}</Typography>
           <Typography sx={{fontWeight:"bold",flex:"1"}} >{format(item.starttime,"HH:mm a")} - {format(item.endtime,"HH:mm a")}</Typography>

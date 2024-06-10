@@ -1,8 +1,8 @@
 "use client"
 import { useEffect, useState } from "react"
-import LeaveTable, { LeaveTableDetails } from "./tabledata"
+import LeaveTable, { LeaveTableDetails, PendingLeaveTableDetails } from "./tabledata"
 import { QueryResultRow } from "@vercel/postgres"
-import { getApplicationByUsername } from "@/data/leaveapplications";
+import { getApplicationByUsername, getPendingApplicationByUsername } from "@/data/leaveapplications";
 import { useSession } from "next-auth/react";
 import { useQuery } from "react-query";
 import { CircularProgressSpinner } from "../../../components/CircularProgress";
@@ -10,14 +10,14 @@ import { NoDataFound } from "../../../components/NoDataFound";
 import { ErrorOccured } from "../../../components/ErrorOccured";
 import { Box, Typography } from "@mui/material";
 
-export default function Applications() {
+export default function PendingApplications() {
     const { data: session } = useSession();
     const username = session?.user?.email;
 
     const [applications, setApplications] = useState<QueryResultRow[] | null>(null);
-    const getApplications = () => getApplicationByUsername(username)
+    const getApplications = () => getPendingApplicationByUsername(username)
     const { data, isError, isLoading, error } = useQuery(
-        [username, 'leave-applications'],
+        [username, 'pending-leave-applications'],
         getApplications,
         {
             enabled: !!username,
@@ -41,10 +41,10 @@ export default function Applications() {
     return (
         <>
             <Box sx={{ marginTop: "3vh" }}>
-                <Typography sx={{ fontWeight: "bold", fontSize: "1.6em", textAlign: "center" }} >My Leave Applications</Typography>
+                <Typography sx={{ fontWeight: "bold", fontSize: "1.6em", textAlign: "center" }} >My Pending Applications</Typography>
             </Box>
-            {applications && applications?.length > 0 && !isLoading ? (<LeaveTableDetails applications={applications} />
-            ) : (<NoDataFound message={"You dont have any leave applicatios"} />)}
+            {applications && applications?.length > 0 && !isLoading ? (<PendingLeaveTableDetails applications={applications} />
+            ) : (<NoDataFound message={"You dont have any pending leave applicatios"} />)}
         </>
     )
 }

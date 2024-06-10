@@ -16,7 +16,7 @@ export const deleteTag = async (id:string) =>{
 }
 export const editTag = async (id:string,tagname:string) =>{
     try {
-        await sql`UPDATE tags SET projectname=${tagname} WHERE id=${id}`
+        await sql`UPDATE tags SET tagname=${tagname} WHERE id=${id}`
     }catch(error) {
   throw new Error((error as Error).message);
     }  

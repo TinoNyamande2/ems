@@ -1,10 +1,9 @@
 "use server";
-import { PerfomanceCreate } from "@/interfaces/performance";
+import { PerfomanceCreate, PerfomanceEdit } from "@/interfaces/performance";
 import { sql } from "@vercel/postgres";
 
 export const addPerformance = async (performance: PerfomanceCreate) => {
   try {
-    console.log("Saving");
     await sql`INSERT INTO performance (starttime,endtime,totalhours,date,project,tags,summary,username)
     VALUES (${performance.starttime},${performance.endtime},${performance.totalhours},
         ${performance.date},${performance.project} ,${performance.tags},${performance.summary},${performance.username}
@@ -13,8 +12,9 @@ export const addPerformance = async (performance: PerfomanceCreate) => {
     throw new Error((error as Error).message);
   }
 };
-export const getPerformanceByUsername = async(username: string|undefined|null) => {
-  
+export const getPerformanceByUsername = async (
+  username: string | undefined | null
+) => {
   try {
     const data = await sql`SELECT * FROM performance a
                              JOIN projects b
@@ -33,7 +33,7 @@ export const getPerformanceForDayByUsername = async (
 ) => {
   try {
     const converteddate = new Date(date);
-    const data = await sql`SELECT * FROM performance a
+    const data = await sql`SELECT a.*,b.projectname,c.tagname FROM performance a
                              JOIN projects b
                              ON a.project::uuid = b.id
                             JOIN tags c
@@ -44,8 +44,38 @@ export const getPerformanceForDayByUsername = async (
     throw new Error((error as Error).message);
   }
 };
-export const getPerformanceById = (id: string) => {};
-export const editPerformance = (id: string) => {};
+export const getPerformanceById = async(id: string) => {
+      try {
+        const data = await sql`SELECT a.*,b.projectname,c.tagname FROM performance a
+                             JOIN projects b
+                             ON a.project::uuid = b.id
+                            JOIN tags c
+                             ON a.tags::uuid= c.id WHERE a.id=${id}`
+        return data.rows[0]
+      }catch (error) {
+        throw new Error((error as Error).message);
+      }
+};
+
+export const deletePerformance = async(id: string) => {
+  try {
+    await sql`DELETE FROM performance WHERE id=${id}`
+  }catch (error) {
+    throw new Error((error as Error).message);
+  }
+};
+export const editPerformance = async(performance:PerfomanceEdit) => {
+  try {
+await sql`UPDATE performance SET starttime=${performance.starttime},
+endtime=${performance.endtime} ,
+summary=${performance.summary} ,
+project=${performance.project} ,
+totalhours=${performance.totalhours},
+tags=${performance.tags} WHERE id =${performance.id} `
+  }catch (error) {
+    throw new Error((error as Error).message);
+  }
+};
 
 export const getAllPerformanceFromPeriod = async (
   startDate: string,
@@ -70,7 +100,6 @@ export const getHoursPerProject = async (
   endDate: string,
   groupBy: string
 ) => {
-  
   try {
     const convertedStartdate = new Date(startDate);
     const convertedEnddate = new Date(endDate);
@@ -111,6 +140,54 @@ export const getHoursPerProjectTable = async (
       WHERE a.date > ${convertedStartdate.toISOString()} AND a.date < ${convertedEnddate.toISOString()}
       GROUP BY b.projectname ;
     `;
+    return data.rows;
+  } catch (error) {
+    throw new Error((error as Error).message);
+  }
+};
+export const getPerformanceByProjectName = async (projectname: string) => {
+  try {
+    const data =
+      await sql`SELECT c.tagname as label,SUM(CAST(a.totalhours AS DOUBLE PRECISION)) AS value
+   FROM performance a 
+   JOIN projects b ON a.project::uuid = b.id 
+   JOIN tags c ON a.tags::uuid=c.id 
+   WHERE b.projectname = ${projectname}
+   GROUP BY c.tagname`;
+    return data.rows;
+  } catch (error) {
+    throw new Error((error as Error).message);
+  }
+};
+export const getPerformanceByUserName = async (username: string) => {
+  try {
+    const data = await sql`    SELECT 
+        c.projectname as label,SUM(CAST(b.totalhours AS DOUBLE PRECISION)) AS value
+      FROM 
+        users a
+      JOIN 
+        performance b ON a.email = b.username
+JOIN projects c ON b.project::uuid = c.id
+      WHERE 
+        a.name = ${username}
+GROUP BY c.projectname`;
+    return data.rows;
+  } catch (error) {
+    throw new Error((error as Error).message);
+  }
+};
+
+export const getPerformanceForProjectGroupByUserName = async (
+  projectname: string
+) => {
+  try {
+    const data =
+      await sql`SELECT c.email as label,SUM(CAST(a.totalhours AS DOUBLE PRECISION)) AS value
+    FROM performance a 
+    JOIN projects b ON a.project::uuid = b.id 
+    JOIN users c ON a.username=c.email 
+    WHERE b.projectname = ${projectname}
+    GROUP BY c.email`;
     return data.rows;
   } catch (error) {
     throw new Error((error as Error).message);

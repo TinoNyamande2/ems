@@ -9,6 +9,7 @@ import { PerformanceByHourtable } from "./OverviewTable";
 import { validateHeaderValue } from "http";
 import Search from "./search";
 import { useRouter ,useSearchParams} from "next/navigation";
+import {format} from "date-fns"
 
 export default function Overview (){
     
@@ -29,6 +30,9 @@ export default function Overview (){
                 <Search placeholder="" />
             </Box>
             <hr />
+            <Box sx={{marginTop:"3vh"}}>
+                <Typography sx={{fontWeight:"bold",fontSize:"1.6em",textAlign:"center"}} >Performance Data from {format(from,"EEEE dd MMMM yyyy")} to {format(to,"EEEE dd MMMM yyyy")}</Typography>
+            </Box>
             <Box sx={{ marginTop: "5vh", marginBotton: "5vh",marginLeft:"auto",marginRight:"auto",width:"80%" }} >
                 <PerformancePieChart startdate={from} enddate={to} groupBy={groupBy}/>
             </Box>

@@ -68,7 +68,21 @@ export const getApplicationByUsername = async (username: string|null|undefined) 
   try {
     if(username) {
       const data =
-      await sql`SELECT * FROM leaveapplication a JOIN users b ON a.username = b.email WHERE username=${username} `;
+      await sql`SELECT * FROM leaveapplication  WHERE username=${username} `;
+      return data.rows;
+    } else {
+      throw new Error("Username cannot be null")
+    }
+  
+  } catch (error) {
+    throw new Error(error as string);
+  }
+};
+export const getPendingApplicationByUsername = async (username: string|null|undefined) => {
+  try {
+    if(username) {
+      const data =
+      await sql`SELECT * FROM leaveapplication  WHERE username=${username} AND status='NEW'`;
       return data.rows;
     } else {
       throw new Error("Username cannot be null")
@@ -125,8 +139,32 @@ export const editLeaveApplication = async (
 };
 export const getLatestApplications = async () =>{
   try {
-       const data = await sql`SELECT * FROM leaveapplication a JOIN users b ON a.username = b.email WHERE TO_DATE(startdate,'YYYY-MM-DD') >CURRENT_DATE ORDER BY TO_DATE(startdate,'YYYY-MM-DD')  LIMIT 10`
+       const data = await sql`SELECT * FROM leaveapplication a JOIN users b ON a.username = b.email WHERE TO_DATE(startdate,'YYYY-MM-DD') >CURRENT_DATE AND status='APPROVED'   ORDER BY TO_DATE(startdate,'YYYY-MM-DD') LIMIT 10`
        return data.rows;
+  }catch (error) {
+    throw new Error(error as string);
+  }
+}
+
+export const getOnLeaveApplications = async () =>{
+  try {
+       const data = await sql`SELECT * FROM leaveapplication a JOIN users b ON a.username = b.email WHERE TO_DATE(startdate,'YYYY-MM-DD') < CURRENT_DATE AND TO_DATE(enddate,'YYYY-MM-DD') > CURRENT_DATE AND status='APPROVED' ORDER BY TO_DATE(startdate,'YYYY-MM-DD')`
+       return data.rows;
+  }catch (error) {
+    throw new Error(error as string);
+  }
+}
+export const deleteApplication = async (id:string) =>{
+  try {
+    sql`DELETE FROM leaveapplication WHERE id =${id}`
+  }catch (error) {
+    throw new Error(error as string);
+  }
+}
+export const editApplication = async (application:LeaveApplicationEdit) =>{
+  try {
+    const totalDays = getWeekdaysBetweenDates( new Date(application.startdate),new Date(application.enddate))
+    sql`UPDATE leaveapplication SET leavetype=${application.leavetype} ,startdate=${application.startdate}, enddate=${application.enddate},totaldays=${totalDays} WHERE id =${application.id}`
   }catch (error) {
     throw new Error(error as string);
   }
