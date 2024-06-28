@@ -15,12 +15,10 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { getServerSession } from 'next-auth';
-import { signIn, signOut, useSession } from "next-auth/react"
-import { authOptions } from '../../../../lib/authOptions';
-import { redirect, useRouter, useSearchParams } from 'next/navigation'
+import { useSession } from "next-auth/react"
+import { useRouter, useSearchParams } from 'next/navigation'
 import { UserDefaultValues, User } from '@/interfaces/user';
-import { ChangeEvent, useEffect } from 'react';
+import { ChangeEvent, Suspense, useEffect } from 'react';
 import { acceptInvite } from '@/data/invites';
 
 const defaultTheme = createTheme();
@@ -98,7 +96,8 @@ export default function SignUp() {
     };
 
     return (
-        <ThemeProvider theme={defaultTheme}>
+        <Suspense fallback={<CircularProgressSpinner message='Loading'/>}>
+            <ThemeProvider theme={defaultTheme}>
             <Container component="main" maxWidth="xs">
                 <ToastNotificationSuccess message={"Sign up successful"} isOpen={open} handleClick={handleClick} duration={3000} />
                 <ToastNotificationError message={errorSavingData} isOpen={errorToastOpen} handleClick={handleClick} duration={9000} />
@@ -187,5 +186,6 @@ export default function SignUp() {
                 )}
             </Container>
         </ThemeProvider>
+        </Suspense>
     );
 }

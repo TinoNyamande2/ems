@@ -21,9 +21,6 @@ export default function Page () {
 
     const { data: session } = useSession();
   
-    if(!session) {
-      redirect("/login")
-    }
 
     const handleTrackerSelected = () => {
         setTrackerSelected(true);

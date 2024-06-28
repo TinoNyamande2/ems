@@ -1,22 +1,14 @@
-import { mainListItems, secondaryListItems } from "@/app/defaultcomponents/listItems";
 import { List, Divider } from "@mui/material";
-import { SessionProvider, signIn, signOut, useSession } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import PeopleIcon from '@mui/icons-material/People';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import LayersIcon from '@mui/icons-material/Layers';
-import AssignmentIcon from '@mui/icons-material/Assignment'; 
-import { Logout } from "@mui/icons-material";
-import {redirect} from 'next/navigation';
 import FlightIcon from '@mui/icons-material/Flight';
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-import BusinessIcon from '@mui/icons-material/Business';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';

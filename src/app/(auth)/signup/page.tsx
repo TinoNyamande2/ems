@@ -26,12 +26,14 @@ import { AddUser } from '@/data/user';
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-  const { data: session } = useSession();
-  const router = useRouter();
   const [isSaving, setIsSaving] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [errorToastOpen, setErrorToastOpen] = React.useState(false);
   const [errorSavingData, setErrorSavingData] = React.useState("");
+  const router = useRouter();
+
+  const { data: session } = useSession();
+
 
   React.useEffect(() => {
     if (session) {
@@ -90,7 +92,9 @@ export default function SignUp() {
     try {
       await AddUser(inputs);
       setOpen(true);
-      router.push("/");
+      setTimeout(() => {
+        router.push("/");
+      }, 3000); 
     }catch (error) {
       setErrorSavingData((error as Error).message);
       setErrorToastOpen(true);

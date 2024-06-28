@@ -24,12 +24,10 @@ export default function Page({ params }: { params: { id: string } }) {
     const { data, isLoading, isError, error } = useQuery(['application', id], () => getApplicationById(id));
 
     useEffect(() => {
-        console.log("ID",id)
         if (!isLoading) {
             setApplication(data);
-            console.log(data)
         }
-    }, [data,isLoading]);
+    }, [data,isLoading,id]);
 
     const handleClick = () => {
         setOpen(false);

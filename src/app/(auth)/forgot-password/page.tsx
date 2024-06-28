@@ -4,9 +4,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import { CircularProgressSpinner } from '../../../../components/misc/CircularProgress';
 import Grid from '@mui/material/Grid';
 import { ToastNotificationSuccess, ToastNotificationError } from '../../../../components/misc/ToastNotification';
@@ -16,15 +13,14 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useRouter, useSearchParams } from 'next/navigation'
-import { UserDefaultValues, User } from '@/interfaces/user';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { resetPassword } from '@/data/user';
 
 const defaultTheme = createTheme();
 
 
 
-export default function ForgotPasswordForm() {
+export default function Page() {
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
     const [open, setOpen] = useState(false);
@@ -40,7 +36,7 @@ export default function ForgotPasswordForm() {
     const tokenValue = searchParams.get("token") || "";
     useEffect(() => {
         setToken(tokenValue)
-    }, [searchParams, token])
+    }, [searchParams, tokenValue])
 
 
 
@@ -87,7 +83,8 @@ export default function ForgotPasswordForm() {
 
 
     return (
-        <ThemeProvider theme={defaultTheme}>
+        <React.Suspense fallback={<CircularProgressSpinner message='Loading'/>} >
+            <ThemeProvider theme={defaultTheme}>
             <Container component="main" maxWidth="xs">
                 <ToastNotificationSuccess message={"Password has been changed successfully"} isOpen={open} handleClick={handleClick} duration={3000} />
                 <ToastNotificationError message={errorSavingData} isOpen={errorToastOpen} handleClick={handleClick} duration={9000} />
@@ -152,5 +149,6 @@ export default function ForgotPasswordForm() {
                 )}
             </Container>
         </ThemeProvider>
+        </React.Suspense>
     );
 }
