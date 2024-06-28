@@ -1,32 +1,38 @@
 "use client";
-import { getPerformanceByProjectName } from "@/data/perfomance";
 import { Box, Typography } from "@mui/material";
-import { QueryResultRow } from "@vercel/postgres";
-import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { ProjectsTable } from "./user/[id]/table";
-import { useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { PerformanceSummaryForUserProjects } from "../../../components/performancetracker/user/userSummaryTables";
+import { UserSearchGroupBy, UserSummarySearch } from "./userSummarySearch";
+import { useSearchParams ,usePathname, useRouter} from "next/navigation";
 
-export default function Reports() {
-    const { data: session, status } = useSession();
-    const id = session?.user?.name;
 
-    if (status === "loading") {
-        return <Typography>Loading...</Typography>;
-    }
-
-    if (status === "unauthenticated") {
-        return <Typography>You need to be authenticated to view this page.</Typography>;
-    }
-
+export default function Reports({ organisation, username, name }: { organisation: string | null | undefined, username: string | null | undefined, name: string | null | undefined }) {
+    const searchParams = useSearchParams();
+    const groupBy = searchParams.get("groupBy") || "";
+    const startDateFilter = searchParams.get("startDate") || "";
+    const endDateFilter = searchParams.get("endDate") || "";
+    const timePeriod = searchParams.get("timePeriod") || "";
+    const pathname = usePathname();
+    const { replace } = useRouter();
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams);
+        params.delete('groupBy');
+        params.delete('timePeriod');
+        params.delete('startDate');
+        params.delete('endDate');
+        replace(`${pathname}?${params.toString()}`);
+    }, [pathname,searchParams])
     return (
         <Box>
             <Box sx={{ marginTop: "3vh" }}>
                 <Typography sx={{ fontWeight: "bold", fontSize: "1.6em", textAlign: "center" }} >
-                    {id}
+                    Summary for {name}
                 </Typography>
-            </Box>            
-            {status === "authenticated" && id && <ProjectsTable id={id} />}
+            </Box>
+            <Box>
+                <UserSummarySearch placeholder="" />
+            </Box>
+            {<PerformanceSummaryForUserProjects startDate={startDateFilter} timePeriod={timePeriod} endDate={endDateFilter} username={username} groupBy={groupBy} organisation={organisation} />}
         </Box>
     );
 }

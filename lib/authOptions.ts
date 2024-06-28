@@ -74,7 +74,7 @@ export const authOptions: NextAuthOptions = {
       if (account?.provider === 'google') {
         const data = await sql`SELECT * FROM users WHERE email=${user.email} LIMIT 1`;
         if (data.rowCount === 0) {
-          await sql`INSERT INTO users (name, email) VALUES (${user.name}, ${user.email})`;
+          await sql`INSERT INTO users (name, email,role) VALUES (${user.name}, ${user.email} ,'admin')`;
         } else {
           console.log("User already exists");
         }

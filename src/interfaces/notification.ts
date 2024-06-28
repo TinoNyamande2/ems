@@ -4,7 +4,8 @@ export interface NotificationCreate {
     date:string,
     read:boolean,
     message:string,
-    applicationid:string
+    applicationid:string,
+    organisation:string|null|undefined
 }
 
 export const NotificationDefaultValues:NotificationCreate = {
@@ -13,5 +14,6 @@ export const NotificationDefaultValues:NotificationCreate = {
     date:"",
     read:false,
     message:"",
-    applicationid:""
+    applicationid:"",
+    organisation:""
 }

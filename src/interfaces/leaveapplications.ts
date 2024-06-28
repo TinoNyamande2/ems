@@ -6,6 +6,7 @@ export interface LeaveApplicationCreate  {
     leavetype:string,
     status:string,
     applicationdate:string,
+    organisationid:string|null|undefined
 }
 
 export const LeaveApplicationCreateDefaultValues:LeaveApplicationCreate = {
@@ -15,7 +16,8 @@ export const LeaveApplicationCreateDefaultValues:LeaveApplicationCreate = {
     totaldays:"",
     leavetype:"",
     status:"",
-    applicationdate:""
+    applicationdate:"",
+    organisationid:""
 }
 
 export interface LeaveApplicationEdit  {
@@ -26,7 +28,7 @@ export interface LeaveApplicationEdit  {
     totaldays:string,
     leavetype:string,
     status:string,
-    applicationdate:string
+    applicationdate:string,
 
 }
 
@@ -38,7 +40,7 @@ export const LeaveApplicationEditDefaultValues:LeaveApplicationEdit = {
     totaldays:"",
     leavetype:"",
     status:"",
-    applicationdate:""
+    applicationdate:"",
 
 }
 

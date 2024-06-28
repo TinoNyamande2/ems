@@ -47,7 +47,7 @@ export const SmallCircularProgressSpinner=({message}:{message:string})=> {
         }}
     >
         <CircularProgress size={40} /> 
-        <Typography sx={{ mt: 2, fontSize: "0.9em" }}>Loading ...</Typography> {/* Add margin-top for spacing */}
+        <Typography sx={{ mt: 2, fontSize: "0.9em" }}>{message}</Typography>
     </Box>
 </Box>
 

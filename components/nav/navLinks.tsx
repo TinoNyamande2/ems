@@ -84,17 +84,11 @@ export const NavLinks = () => {
             {session && <ListSubheader component="div" inset>
                 Account Info
             </ListSubheader>}
-            {session && <ListItemButton>
+            {session && <ListItemButton onClick={()=>handleRedirect("/profile")} >
                 <ListItemIcon>
                     <ManageAccountsIcon />
                 </ListItemIcon>
                 <ListItemText primary="View Profile" />
-            </ListItemButton>}
-            {session && <ListItemButton>
-                <ListItemIcon>
-                    <BusinessIcon/>
-                </ListItemIcon>
-                <ListItemText primary="Company Profile" />
             </ListItemButton>}
             {session && <ListItemButton onClick={()=>signOut()}>
                 <ListItemIcon>

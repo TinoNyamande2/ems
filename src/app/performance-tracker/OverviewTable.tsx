@@ -3,19 +3,19 @@ import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableH
 import { QueryResultRow } from "@vercel/postgres";
 import { subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
-import { CircularProgressSpinner } from "../../../components/CircularProgress";
+import { CircularProgressSpinner } from "../../../components/misc/CircularProgress";
 import { useQuery } from "react-query";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 
-export const PerformanceByHourtable = ({ startdate, enddate, groupBy }: { startdate: string, enddate: string, groupBy: string }) => {
+export const PerformanceByHourtable = ({ startdate, enddate, groupBy,organisation }: { startdate: string, enddate: string, groupBy: string,organisation:string|null|undefined }) => {
     const [performances, setPerformances] = useState<QueryResultRow[] | undefined>(undefined);
     const [totalHours, setTotalHours] = useState(1);
 
 
     const { data, isError, isLoading, error } = useQuery(
         ['table-performances', startdate, enddate],
-        () => getHoursPerProject(startdate, enddate, groupBy)
+        () => getHoursPerProject(startdate, enddate, groupBy,organisation)
     );
     const router = useRouter();
 
@@ -31,7 +31,6 @@ export const PerformanceByHourtable = ({ startdate, enddate, groupBy }: { startd
     useEffect(() => {
         if (!isLoading && data) {
             setPerformances(data);
-            console.log("Table", data)
             const total = data.reduce((acc, row) => acc + parseFloat(row.value), 0);
             setTotalHours(total)
 

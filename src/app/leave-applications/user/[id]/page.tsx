@@ -3,17 +3,17 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRouter } from 'next/navigation';
 import { Button } from '@mui/material';
-import { ApproveApplication, RejectApplication, deleteApplication, editApplication, getApplicationById } from '@/data/leaveapplications';
-import { CircularProgressSpinner } from '../../../../../components/CircularProgress';
-import { ToastNotificationError, ToastNotificationSuccess, ToastNotificationWarning } from '../../../../../components/ToastNotification';
-import { ErrorOccured } from '../../../../../components/ErrorOccured';
+import { deleteApplication, editApplication, getApplicationById } from '@/data/leaveapplications';
+import { CircularProgressSpinner } from '../../../../../components/misc/CircularProgress';
+import { ToastNotificationError, ToastNotificationSuccess, ToastNotificationWarning } from '../../../../../components/misc/ToastNotification';
+import { ErrorOccured } from '../../../../../components/misc/ErrorOccured';
 import Link from 'next/link';
 import "./../../../globals.css";
 import { QueryResultRow } from '@vercel/postgres';
 import { LeaveApplicationEdit } from '@/interfaces/leaveapplications';
 import { format } from 'date-fns';
 import { ChangeEvent } from 'react';
-import { Autocomplete, Box, Divider, TextField, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 
 export default function Page({ params }: { params: { id: string } }) {

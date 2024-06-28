@@ -7,6 +7,7 @@ export interface PerfomanceCreate {
    tags:string,
    summary:string,
    username:string|undefined|null,
+   organisation:string|undefined|null,
 }
 
 export const PerfomanceCreateDefaultValues : PerfomanceCreate = {
@@ -17,7 +18,8 @@ export const PerfomanceCreateDefaultValues : PerfomanceCreate = {
     project:"",
     tags:"",
     summary:"",
-    username:""
+    username:"",
+    organisation:""
  }
 
  export interface PerfomanceEdit {

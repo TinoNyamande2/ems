@@ -145,4 +145,12 @@ button {
 
 
 
-  
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-cell {
+  max-width: 150px; /* Adjust this value as needed */
+}

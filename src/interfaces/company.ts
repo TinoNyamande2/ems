@@ -1,45 +1,25 @@
 export interface CompanyCreate {
-     companyname:string,
-     userid:string,
-     phone:string,
-     whatsapp:string,
-     facebook:string,
-     address: string,
-     email:string
+     name:string,
+     userid:string|undefined|null,
+ 
 
 }
 
 export interface CompanyEdit {
     id:string,
-    companyname:string,
-    userid:string,
-    phone:string,
-    whatsapp:string,
-    facebook:string,
-    address: string,
-    email:string
-
+    name:string,
+    userid:string
 }
 
 export const CompanyCreateDefaultValues :CompanyCreate=  {
-    companyname:"",
+    name:"",
     userid:"",
-    phone:"",
-    whatsapp:"",
-    facebook:"",
-    address: "",
-    email:""
-
 }
 
 export const CompanyEditDefaultValues:CompanyEdit = {
     id:"",
-   companyname:"",
+   name:"",
    userid:"",
-   phone:"",
-   whatsapp:"",
-   facebook:"",
-   address: "",
-   email:""
+ 
 
 }

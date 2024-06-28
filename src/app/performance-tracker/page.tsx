@@ -10,6 +10,7 @@ import { QueryResultRow } from "@vercel/postgres";
 import { useQuery } from "react-query";
 import { useSession } from "next-auth/react";
 import { alpha } from '@mui/material';
+import {redirect} from 'next/navigation'
 
 
 export default function Page () {
@@ -17,6 +18,12 @@ export default function Page () {
     const [reportsSelected, setReportsSelected] = useState(false);
     const [overviewSelected,setOverviewSelected] = useState(false);
     const [user,setUser] = useState<QueryResultRow|undefined>(undefined);
+
+    const { data: session } = useSession();
+  
+    if(!session) {
+      redirect("/login")
+    }
 
     const handleTrackerSelected = () => {
         setTrackerSelected(true);
@@ -34,7 +41,6 @@ export default function Page () {
         setReportsSelected(false);
         setOverviewSelected(true)
     }
-    const { data: session } = useSession();
     const useremail = session?.user?.email;
     const fetchUser = () => getUserByEmail(useremail);
 
@@ -59,7 +65,7 @@ export default function Page () {
         sx={(theme) => ({
           mt: { xs: 8, sm: 2 },
           alignSelf: 'center',
-          height: { xs: 200, sm: 700 },
+          height: "auto",
           width: '100%',
           backgroundImage:
             theme.palette.mode === 'light'
@@ -91,9 +97,9 @@ export default function Page () {
                
             </Box>
             <Box>
-                {trackerSelected && <WorkItems/>}
-                {reportsSelected && <Reports/>}
-                {overviewSelected && <Overview/>}
+                {trackerSelected && <WorkItems organisation={user?.organisationid} username={user?.useremail}/>}
+                {reportsSelected && <Reports organisation={user?.organisationid} username={user?.useremail} name={user?.username}/>}
+                {overviewSelected && <Overview organisation={user?.organisationid}/>}
             </Box>
         </Box>
     )

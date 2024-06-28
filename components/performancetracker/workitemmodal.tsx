@@ -13,9 +13,10 @@ interface AddWorkItemModalProps {
     isOpen: boolean;
     onRequestClose: () => void;
     onAddItem: (project: string, startTime: Dayjs, endTime: Dayjs, tags: string, summary: string) => void;
+    organisation:string|null|undefined
 }
 
-const AddWorkItemModal: React.FC<AddWorkItemModalProps> = ({ isOpen, onRequestClose, onAddItem }) => {
+const AddWorkItemModal: React.FC<AddWorkItemModalProps> = ({ isOpen, onRequestClose, onAddItem,organisation }) => {
     const [project, setProject] = useState('');
     const [projectsList, setProjectsList] = useState<any[]>([]);
     const [tagsList, setTagsList] = useState<any[]>([]);
@@ -27,11 +28,11 @@ const AddWorkItemModal: React.FC<AddWorkItemModalProps> = ({ isOpen, onRequestCl
 
     useEffect(() => {
         const fetchProject = async () => {
-            const data = getAllProjects();
+            const data = getAllProjects(organisation);
             setProjectsList(await data);
         }
         const fetchTags = async () => {
-            const data = getAllTags();
+            const data = getAllTags(organisation);
             setTagsList(await data);
         }
 
@@ -39,25 +40,8 @@ const AddWorkItemModal: React.FC<AddWorkItemModalProps> = ({ isOpen, onRequestCl
         fetchTags();
     }, []);
 
-    // useEffect(() => {
-    //     if (projectsError) {
-    //         console.error("Error fetching projects:", projectsError);
-    //     }
-    //     if (tagsError) {
-    //         console.error("Error fetching tags:", tagsError);
-    //     }
-    // }, [projectsError, tagsError]);
+  
 
-    // useEffect(() => {
-    //     if (!isProjectsLoading && projectsList.length === 0) {
-    //         console.log("Projects list is empty, refetching...");
-    //         refetchProjects();
-    //     }
-    //     if (!isTagsLoading && tagsList.length === 0) {
-    //         console.log("Tags list is empty, refetching...");
-    //         refetchTags();
-    //     }
-    // }, [projectsList, tagsList, isProjectsLoading, isTagsLoading, refetchProjects, refetchTags]);
 
     const handleSubmit = () => {
         if (startTime && endTime && project && tags && summary) {

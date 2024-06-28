@@ -4,9 +4,9 @@ import { useQuery } from 'react-query';
 import { useRouter } from 'next/navigation';
 import { Button } from '@mui/material';
 import { ApproveApplication, RejectApplication, getApplicationById } from '@/data/leaveapplications';
-import { CircularProgressSpinner } from '../../../../components/CircularProgress';
-import { ToastNotificationError, ToastNotificationSuccess, ToastNotificationWarning } from '../../../../components/ToastNotification';
-import { ErrorOccured } from '../../../../components/ErrorOccured';
+import { CircularProgressSpinner } from '../../../../components/misc/CircularProgress';
+import { ToastNotificationError, ToastNotificationSuccess, ToastNotificationWarning } from '../../../../components/misc/ToastNotification';
+import { ErrorOccured } from '../../../../components/misc/ErrorOccured';
 import Link from 'next/link';
 import "./../../globals.css";
 import { QueryResultRow } from '@vercel/postgres';
@@ -24,8 +24,10 @@ export default function Page({ params }: { params: { id: string } }) {
     const { data, isLoading, isError, error } = useQuery(['application', id], () => getApplicationById(id));
 
     useEffect(() => {
+        console.log("ID",id)
         if (!isLoading) {
             setApplication(data);
+            console.log(data)
         }
     }, [data,isLoading]);
 

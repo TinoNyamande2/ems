@@ -11,7 +11,7 @@ import {redirect} from 'next/navigation'
 import { getUserByEmail } from "@/data/user";
 import { useQuery } from "react-query";
 import { QueryResultRow } from "@vercel/postgres";
-import { CircularProgressSpinner } from "../../../components/CircularProgress";
+import { CircularProgressSpinner } from "../../../components/misc/CircularProgress";
 import { alpha } from '@mui/material';
 import PendingApplications from "./pending";
 import LeaveReports from "./reports";
@@ -95,7 +95,7 @@ export default function Page () {
         sx={(theme) => ({
           mt: { xs: 8, sm: 2 },
           alignSelf: 'center',
-          height: { xs: 200, sm: 700 },
+          height: "auto",
           width: '100%',
           backgroundImage:
             theme.palette.mode === 'light'
@@ -127,17 +127,17 @@ export default function Page () {
                 {user?.role=='admin' && !isLoading && <Button size="small" onClick={handleReportsSelected} fullWidth sx={{
                     ...(reportsSelected && { backgroundColor: "blue", color: "white" }),
                 }}>Reports</Button>}
-                {user?.role !='admin' && !isLoading && <Button size="small" onClick={handleApproveSelected} fullWidth sx={{
+                {user?.role !='admin' && !isLoading && <Button size="small" onClick={handlePendingSelected} fullWidth sx={{
                     ...(pendingSelected && { backgroundColor: "blue", color: "white" }),
                 }}>Pending Applications</Button>}
             
             </Box>
             <Box sx={{marginTop:"3vh"}}>
-                {applicationsSelected && <Applications/>}
-                {applySelected && <Apply/>}
-                {approveSelected && <Approve />}
-                {pendingSelected && <PendingApplications />}
-                {reportsSelected && <LeaveReports />}
+                {applicationsSelected && <Applications username={user?.useremail} organisation={user?.organisationid}/>}
+                {applySelected && <Apply username={user?.useremail} organisation={user?.organisationid} />}
+                {approveSelected && <Approve organisation={user?.organisationid} />}
+                {pendingSelected && <PendingApplications username={user?.useremail} organisation={user?.organisationid}/>}
+                {reportsSelected && <LeaveReports organisation={user?.organisationid} />}
 
             </Box>
         </Box>

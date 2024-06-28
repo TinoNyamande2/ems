@@ -4,21 +4,20 @@ import { QueryResultRow } from "@vercel/postgres"
 import { getApplicationByUsername, getLatestApplications, getOnLeaveApplications } from "@/data/leaveapplications";
 import { useSession } from "next-auth/react";
 import { useQuery } from "react-query";
-import { SmallCircularProgressSpinner } from "./CircularProgress";
+import { SmallCircularProgressSpinner } from "../misc/CircularProgress";
 import LeaveTable, { LeaveTableForDashboard, OnLeaveTableForDashboard } from "@/app/leave-applications/tabledata";
-import { ErrorOccured } from "./ErrorOccured";
-import { NoDataFound } from "./NoDataFound";
+import { ErrorOccured } from "../misc/ErrorOccured";
+import { NoDataFound } from "../misc/NoDataFound";
 
 
-export default function LatestApplications() {
+export default function LatestApplications({organisation}:{organisation:string|null|undefined}) {
 
     const [applications, setApplications] = useState<QueryResultRow[] | null>(null);
-    const getApplications = () => getLatestApplications();
+    const getApplications = () => getLatestApplications(organisation);
     const { data, isError, isLoading, error } = useQuery(
         ['latest-applications', 'leave-applications'],getApplications);
     useEffect(() => {
         if (!isLoading && data) {
-            console.log(data)
             setApplications(data);
         }
     }, [ data, isLoading])
@@ -39,15 +38,13 @@ export default function LatestApplications() {
     )
 }
 
-export const OnLeaveApplications = ()=> {
+export const OnLeaveApplications = ({organisation}:{organisation:string|null|undefined})=> {
 
     const [applications, setApplications] = useState<QueryResultRow[] | null>(null);
-    const getApplications = () => getOnLeaveApplications();
     const { data, isError, isLoading, error } = useQuery(
-        ['on-leave-applications', 'leave-applications'],getApplications);
+        ['on-leave-applications', 'leave-applications'],()=>getOnLeaveApplications(organisation));
     useEffect(() => {
         if (!isLoading && data) {
-            console.log(data)
             setApplications(data);
         }
     }, [ data, isLoading])

@@ -1,8 +1,8 @@
 "use server"
 import {sql} from "@vercel/postgres"
-export const createProject = async (projectname:string) =>{
+export const createProject = async (projectname:string,organisation:string) =>{
     try {
-        await sql`INSERT INTO projects(projectname) VALUES (${projectname})`
+        await sql`INSERT INTO projects(projectname,organisation) VALUES (${projectname},${organisation})`
     }catch(error) {
   throw new Error((error as Error).message);
     }
@@ -30,9 +30,9 @@ export const getProjectById = async (id:string) =>{
     }  
 }
 
-export const getAllProjects = async () =>{
+export const getAllProjects = async (organisation:string|null|undefined) =>{
     try {
-        const data = await sql`SELECT * FROM projects`
+        const data = await sql`SELECT * FROM projects WHERE organisation=${organisation}`
         return data.rows
     }catch(error) {
   throw new Error((error as Error).message);

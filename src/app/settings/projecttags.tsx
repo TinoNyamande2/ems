@@ -5,15 +5,15 @@ import { useQuery } from "react-query";
 import { createProject, getAllProjects } from "@/data/projects";
 import { Container, Typography, Button, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Box } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import AddTagModal from "../../../components/addProjectModal";
-import { CircularProgressSpinner } from '../../../components/CircularProgress';
-import { ToastNotificationError, ToastNotificationSuccess } from '../../../components/ToastNotification';
+import AddTagModal from "../../../components/performancetracker/addProjectModal";
+import { CircularProgressSpinner } from '../../../components/misc/CircularProgress';
+import { ToastNotificationError, ToastNotificationSuccess } from '../../../components/misc/ToastNotification';
 import { createTags, getAllTags } from "@/data/tags";
 
-export const Tags = () => {
+export const Tags = ({organisation}:{organisation:string}) => {
 
   const [tags, setTags] = useState<QueryResultRow[] | undefined>(undefined);
-  const { data, error, isError, isLoading,refetch } = useQuery("all-tags", () => getAllTags());
+  const { data, error, isError, isLoading,refetch } = useQuery("all-tags", () => getAllTags(organisation));
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const [errors, setErrors] = useState('');
   const [isSaving, setIsSaving] = useState(false)
@@ -28,7 +28,7 @@ export const Tags = () => {
   }, [data, isLoading])
   const addTag = async (tagname: string) => {
     try {
-      await createTags(tagname);
+      await createTags(tagname,organisation);
       setOpen(true)
       refetch();
     } catch (error) {
@@ -45,7 +45,7 @@ export const Tags = () => {
       <ToastNotificationSuccess message={"Tag Saved Successfully"} isOpen={open} handleClick={handleClick} duration={3000} />
       <ToastNotificationError message={errorSavingData} isOpen={errorToastOpen} handleClick={handleClick} duration={9000} />
       <Typography variant="h4" component="h1" gutterBottom>
-        Projects
+        Project Tags
       </Typography>
       <Button
         variant="contained"

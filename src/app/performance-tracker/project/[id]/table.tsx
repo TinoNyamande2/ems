@@ -3,11 +3,12 @@ import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableH
 import { QueryResultRow } from "@vercel/postgres";
 import { subWeeks } from "date-fns";
 import { useEffect, useState } from "react";
-import { CircularProgressSpinner } from "../../../../../components/CircularProgress";
+import { CircularProgressSpinner } from "../../../../../components/misc/CircularProgress";
 import { useQuery } from "react-query";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
-import { CustomPieChart } from "../../../../../components/PieChart";
+import { CustomPieChart } from "../../../../../components/charts/PieChart";
+import { useUserContext } from "@/context/userContext";
 
 interface ProjectGraph {
     id: string,
@@ -17,7 +18,8 @@ interface ProjectGraph {
 
 export const ProjectsTable = ({ id }: { id: string }) => {
     const [projectData, setProjectData] = useState<QueryResultRow[] | undefined>(undefined)
-    const { data, error, isError, isLoading } = useQuery([id, "project data"], () => getPerformanceByProjectName(id));
+    const {organisation} = useUserContext();
+    const { data, error, isError, isLoading } = useQuery([id, "project data"], () => getPerformanceByProjectName(id,organisation));
     const [performanceData, setPerformanceData] = useState<ProjectGraph[]>([])
     const [returnedData, setReturnedData] = useState<QueryResultRow[] | undefined>(undefined)
 
@@ -96,8 +98,9 @@ export const ProjectsTable = ({ id }: { id: string }) => {
 
 
 export const UsersTable = ({ id }: { id: string }) => {
+    const {organisation} = useUserContext();
     const [projectData, setProjectData] = useState<QueryResultRow[] | undefined>(undefined)
-    const { data, error, isError, isLoading } = useQuery([id, "users data "], () => getPerformanceForProjectGroupByUserName(id));
+    const { data, error, isError, isLoading } = useQuery([id, "users data "], () => getPerformanceForProjectGroupByUserName(id,organisation));
     const [performanceData, setPerformanceData] = useState<ProjectGraph[]>([])
     const [returnedData, setReturnedData] = useState<QueryResultRow[] | undefined>(undefined)
 

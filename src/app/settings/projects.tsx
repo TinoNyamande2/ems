@@ -5,14 +5,14 @@ import { useQuery } from "react-query";
 import { createProject, getAllProjects } from "@/data/projects";
 import { Container, Typography, Button, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Box } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import AddProjectModal from "../../../components/addProjectModal";
-import { CircularProgressSpinner } from '../../../components/CircularProgress';
-import { ToastNotificationError, ToastNotificationSuccess } from '../../../components/ToastNotification';
+import AddProjectModal from "../../../components/performancetracker/addProjectModal";
+import { CircularProgressSpinner } from '../../../components/misc/CircularProgress';
+import { ToastNotificationError, ToastNotificationSuccess } from '../../../components/misc/ToastNotification';
 
-export const Projects = () => {
+export const Projects = ({organisation}:{organisation:string}) => {
 
   const [projects, setProjects] = useState<QueryResultRow[] | undefined>(undefined);
-  const { data, error, isError, isLoading,refetch } = useQuery("all-projects", () => getAllProjects());
+  const { data, error, isError, isLoading,refetch } = useQuery("all-projects", () => getAllProjects(organisation));
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const [errors, setErrors] = useState('');
   const [isSaving, setIsSaving] = useState(false)
@@ -27,7 +27,7 @@ export const Projects = () => {
   }, [data, isLoading])
   const addProject = async (projectname: string) => {
     try {
-      await createProject(projectname)
+      await createProject(projectname,organisation)
       setOpen(true)
       refetch();
     } catch (error) {

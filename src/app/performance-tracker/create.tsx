@@ -1,14 +1,16 @@
 "use client"
 import "./../globals.css"
 import { Dayjs } from 'dayjs';
-import AddWorkItemModal from "../../../components/workitemmodal";
+import AddWorkItemModal from "../../../components/performancetracker/workitemmodal";
 import React, { useState } from 'react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, differenceInMinutes, addWeeks, subWeeks } from 'date-fns';
-import { Button, Container, Typography,Box } from '@mui/material';
+import { Button, Container, Typography, Box } from '@mui/material';
 import { addPerformance } from "@/data/perfomance";
 import { PerfomanceCreate } from "@/interfaces/performance";
 import { useSession } from "next-auth/react";
-import { WorkItemsPerDay } from "../../../components/workItemsPerDay";
+import { WorkItemsPerDay } from "../../../components/performancetracker/workItemsPerDay";
+import { CircularProgressSpinner } from "../../../components/misc/CircularProgress";
+import { ToastNotificationSuccess, ToastNotificationError } from "../../../components/misc/ToastNotification";
 
 interface WorkItem {
   day: Date;
@@ -20,13 +22,17 @@ interface WorkItem {
   summary: string;
 }
 
-const WorkItems: React.FC = () => {
+const WorkItems = ({ organisation, username }: { organisation: string | undefined, username: string | undefined }) => {
   const [workItems, setWorkItems] = useState<WorkItem[]>([]);
   const [currentWeek, setCurrentWeek] = useState<Date>(new Date());
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
-  const { data: session } = useSession();
   const [refetchTrigger, setRefetchTrigger] = useState<number>(0);
+  const [errorToastOpen, setErrorToastOpen] = useState(false)
+  const [errorToastMessage, setErrorToastMessage] = useState("")
+  const [successToastOpen, setSuccessToastOpen] = useState(false)
+  const [successToastMessage, setSuccessToastMessage] = useState("")
+  const [isSaving, setIsSaving] = useState(false)
 
   const startOfWeekDate = startOfWeek(currentWeek, { weekStartsOn: 1 });
   const endOfWeekDate = endOfWeek(currentWeek, { weekStartsOn: 1 });
@@ -47,16 +53,23 @@ const WorkItems: React.FC = () => {
         totalhours: totalHours.toString(),
         tags: tags,
         summary: summary,
-        username: session?.user?.email
+        username: username,
+        organisation: organisation
       }
+      setIsSaving(true)
       try {
-       addPerformance(performance)
+        addPerformance(performance)
+        console.log(performance)
         setWorkItems([...workItems, newItem]);
         setRefetchTrigger(prev => prev + 1);
+        setSuccessToastMessage("Work item saved successfully");
+        setSuccessToastOpen(true)
       } catch (error) {
-        console.log(error)
+        setErrorToastMessage((error as Error).message);
+        setErrorToastOpen(true)
+      } finally {
+        setIsSaving(false)
       }
-
     }
   };
 
@@ -67,33 +80,44 @@ const WorkItems: React.FC = () => {
   const handleNextWeek = () => {
     setCurrentWeek(addWeeks(currentWeek, 1));
   };
+  const handleToastClick = () => {
+    setSuccessToastOpen(false);
+    setErrorToastOpen(false)
+  }
 
   return (
     <Container>
-      <Typography variant="h4" component="h1" gutterBottom>Employee Work Items</Typography>
-      <div>
-        <Button variant="contained" onClick={handlePreviousWeek} sx={{ marginRight: 2 }}>Previous Week</Button>
-        <Button variant="contained" onClick={handleNextWeek}>Next Week</Button>
-      </div>
-      <div>
-        {daysOfWeek.map((day) => (
-          <div key={day.toISOString()} className='day'>
-            <Typography variant="h6" component="h2">{format(day, 'EEEE, MMM d, yyyy')}</Typography>
-            <Button variant="contained" onClick={() => { setSelectedDay(day); setModalIsOpen(true); }}>
-              Add Item
-            </Button>
-            <Box>
-              <WorkItemsPerDay date={day.toDateString()} refetchTrigger={refetchTrigger} />
-            </Box>
+      {isSaving ? (<CircularProgressSpinner message="Saving" />) : (
+        <>
+          <Typography variant="h4" component="h1" gutterBottom>Employee Work Items</Typography>
+          <ToastNotificationSuccess message={successToastMessage} isOpen={successToastOpen} handleClick={handleToastClick} duration={4000} />
+          <ToastNotificationError message={errorToastMessage} isOpen={errorToastOpen} handleClick={handleToastClick} duration={4000} />
+          <div>
+            <Button variant="contained" onClick={handlePreviousWeek} sx={{ marginRight: 2 }}>Previous Week</Button>
+            <Button variant="contained" onClick={handleNextWeek}>Next Week</Button>
           </div>
-        ))}
-      </div>
-      {selectedDay && (
-        <AddWorkItemModal
-          isOpen={modalIsOpen}
-          onRequestClose={() => setModalIsOpen(false)}
-          onAddItem={handleAddItem}
-        />
+          <div>
+            {daysOfWeek.map((day) => (
+              <div key={day.toISOString()} className='day'>
+                <Typography variant="h6" component="h2">{format(day, 'EEEE, MMM d, yyyy')}</Typography>
+                <Button variant="contained" onClick={() => { setSelectedDay(day); setModalIsOpen(true); }}>
+                  Add Item
+                </Button>
+                <Box>
+                  <WorkItemsPerDay username={username} date={day.toDateString()} refetchTrigger={refetchTrigger} organisation={organisation} />
+                </Box>
+              </div>
+            ))}
+          </div>
+          {selectedDay && (
+            <AddWorkItemModal
+              isOpen={modalIsOpen}
+              onRequestClose={() => setModalIsOpen(false)}
+              onAddItem={handleAddItem}
+              organisation={organisation}
+            />
+          )}
+        </>
       )}
     </Container>
   );

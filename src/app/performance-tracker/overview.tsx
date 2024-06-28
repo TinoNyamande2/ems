@@ -8,36 +8,34 @@ import { PerformancePieChart } from "./performancePieChart";
 import { PerformanceByHourtable } from "./OverviewTable";
 import { validateHeaderValue } from "http";
 import Search from "./search";
-import { useRouter ,useSearchParams} from "next/navigation";
-import {format} from "date-fns"
+import { useRouter, useSearchParams } from "next/navigation";
+import { format } from "date-fns"
+import { UserSummarySearch } from "./userSummarySearch";
+import { PerformanceSummaryForAdminProjects } from "../../../components/performancetracker/admin/adminSummaryTables";
+import { AdminSummarySearch } from "./adminSummarySearch";
 
-export default function Overview (){
-    
+export default function Overview({ organisation }: { organisation: string | null | undefined }) {
+
     const [enddate, setEnddate] = useState(new Date());
     const defaultStartdate = subWeeks(enddate, 4);
     const [startdate, setStartDate] = useState(defaultStartdate);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const groupBy = searchParams.get('groupBy')||"Project";
-    const to = searchParams.get("to")||enddate.toISOString();
-    const from = searchParams.get("from")||startdate.toISOString();
-    useEffect(()=>{
-    },[searchParams,to,from,groupBy])
+    const groupBy = searchParams.get("groupBy") || "";
+    const startDateFilter = searchParams.get("startDate") || "";
+    const endDateFilter = searchParams.get("endDate") || "";
+    const timePeriod = searchParams.get("timePeriod") || "";
+    useEffect(() => {
+    }, [searchParams, startDateFilter, endDateFilter, timePeriod, groupBy])
     return (
         <Box>
 
             <Box sx={{ marginTop: "5vh", marginBotton: "5vh" }} >
-                <Search placeholder="" />
+                <AdminSummarySearch placeholder="" />
             </Box>
             <hr />
-            <Box sx={{marginTop:"3vh"}}>
-                <Typography sx={{fontWeight:"bold",fontSize:"1.6em",textAlign:"center"}} >Performance Data from {format(from,"EEEE dd MMMM yyyy")} to {format(to,"EEEE dd MMMM yyyy")}</Typography>
-            </Box>
-            <Box sx={{ marginTop: "5vh", marginBotton: "5vh",marginLeft:"auto",marginRight:"auto",width:"80%" }} >
-                <PerformancePieChart startdate={from} enddate={to} groupBy={groupBy}/>
-            </Box>
-            <Box sx={{ marginTop: "5vh", marginBotton: "5vh" }} >
-                <PerformanceByHourtable startdate={from} enddate={to} groupBy={groupBy} />
+            <Box sx={{ marginTop: "5vh", marginBotton: "5vh", marginLeft: "auto", marginRight: "auto", width: "80%" }} >
+                <PerformanceSummaryForAdminProjects organisation={organisation} timePeriod={timePeriod} startDate={startDateFilter} endDate={endDateFilter} groupBy={groupBy} />
             </Box>
         </Box>
     );

@@ -8,31 +8,29 @@ import { QueryResultRow } from '@vercel/postgres';
 import { useSession } from 'next-auth/react';
 import { useQuery } from 'react-query';
 import { CircularProgressSpinner, SmallCircularProgressSpinner } from './CircularProgress';
-import { ErrorOccured } from './ErrorOccured';
+import { ErrorOccured } from '../misc/ErrorOccured';
 import { deleteNotification, getNotificationsByUsername } from '@/data/notification';
 import { NoDataFound } from './NoDataFound';
 
-export const Notifications = () => {
-    const { data: session } = useSession();
-    const username = session?.user?.email;
+export const Notifications = ({user,organisation}:{user:string|null|undefined, organisation:string|null|undefined}) => {
     const [notifications, setNotifications] = useState<QueryResultRow[] | null>(null);
     const [open, setOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string|null>(null);
 
-    const getApplications = () => getNotificationsByUsername(username);
+    const getApplications = () => getNotificationsByUsername(user,organisation);
     const { data, isError, isLoading, error,refetch } = useQuery(
-        [username, 'notifications'],
+        [user,organisation, 'notifications'],
         getApplications,
-        {
-            enabled: !!username,
-        }
     );
 
     useEffect(() => {
+        console.log("user",user);
+        console.log("organisation",organisation)
         if (!isLoading && data) {
             setNotifications(data);
+            console.log(data)
         }
-    }, [session, data, isLoading]);
+    }, [organisation,user, data, isLoading]);
 
     const handleClickOpen = (id:string) => {
         setSelectedId(id);
@@ -85,7 +83,7 @@ export const Notifications = () => {
                                 alignItems: 'center'
                             }}
                         >
-                            <Link href={`/leave-applications/${message.id}`} passHref>
+                            <Link href={`/leave-applications/${message.applicationid}`} passHref>
                                 <Box>
                                     <Typography
                                         variant="body1"

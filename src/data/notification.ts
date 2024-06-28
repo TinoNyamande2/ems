@@ -4,7 +4,7 @@ import {sql} from "@vercel/postgres"
 
 export const createNotification = async(notification:NotificationCreate) =>{
     try {
-         await sql`INSERT INTO notifications (applicationid,"to","from",date,read,message) VALUES (${notification.applicationid},${notification.to},${notification.from},${notification.date},${false},${notification.message})`
+         await sql`INSERT INTO notifications (applicationid,"to","from",date,read,message,organisation) VALUES (${notification.applicationid},${notification.to},${notification.from},${notification.date},${false},${notification.message},${notification.organisation})`
     }catch(error) {
         throw new Error((error as Error).message);
           }  
@@ -23,9 +23,9 @@ export const deleteNotification = async (id:string) =>{
   throw new Error((error as Error).message);
     }  
 }
-export const getNotificationsByUsername = async(username:string|null|undefined) =>{
+export const getNotificationsByUsername = async(username:string|null|undefined,organisation:string|null|undefined) =>{
   try {
-    const data = await sql`SELECT * FROM notifications WHERE "to"=${username} `
+    const data = await sql`SELECT * FROM notifications WHERE "to"=${username} and organisation=${organisation} `
     return  data.rows
   }catch(error) {
     throw new Error((error as Error).message);
