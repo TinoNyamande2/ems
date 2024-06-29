@@ -8,7 +8,7 @@ import { CircularProgressSpinner } from '../../../../../components/misc/Circular
 import { ToastNotificationError, ToastNotificationSuccess, ToastNotificationWarning } from '../../../../../components/misc/ToastNotification';
 import { ErrorOccured } from '../../../../../components/misc/ErrorOccured';
 import Link from 'next/link';
-import "./../../globals.css";
+import "./../../../globals.css"
 import { QueryResultRow } from '@vercel/postgres';
 
 export default function Page({ params }: { params: { id: string } }) {

@@ -102,6 +102,7 @@ export const PendingLeaveTableDetails = () => {
   const [applications, setApplications] = useState<QueryResultRow[] | null>(null);
   const { username, name, role, organisation, organisationid, setName, setOrganisation, setRole, setUsername, setOrganisationId } = useUserContext();
   const getApplications = () => getPendingApplicationByUsername(username, organisationid)
+  const router = useRouter();
 
   const { data, isError, isLoading, error } = useQuery(
     [username, 'pending-leave-applications'],
@@ -125,7 +126,6 @@ export const PendingLeaveTableDetails = () => {
       <ErrorOccured message={(error as Error).message} />
     )
   }
-  const router = useRouter();
 
   const handleRedirect = (url: string) => {
     router.push(url);
