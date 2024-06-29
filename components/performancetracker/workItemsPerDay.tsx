@@ -41,7 +41,7 @@ export const WorkItemsPerDay = ({ username, date, refetchTrigger, organisation }
     if (refetchTrigger > 0) {
       refetch();
     }
-  }, [refetchTrigger]);
+  }, [refetchTrigger,refetch]);
 
   return (
     <Box>

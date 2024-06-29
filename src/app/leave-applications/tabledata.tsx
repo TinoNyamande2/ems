@@ -1,14 +1,16 @@
+"use client"
 import React, { useEffect, useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
 import { QueryResultRow } from '@vercel/postgres';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { format } from "date-fns"
-import { getAllNewApplication, getFilteredApplications, getLeaveDaysGroupedByLeaveType, getLeaveDaysGroupedByUser } from '@/data/leaveapplications';
+import { getAllNewApplication, getFilteredApplications, getFilteredApplicationsForUser, getLeaveDaysGroupedByLeaveType, getLeaveDaysGroupedByUser, getPendingApplicationByUsername } from '@/data/leaveapplications';
 import { useQuery } from 'react-query';
 import { NoDataFound } from '../../../components/misc/NoDataFound';
 import { CircularProgressSpinner } from '../../../components/misc/CircularProgress';
 import { ErrorOccured } from '../../../components/misc/ErrorOccured';
+import { useUserContext } from '@/context/userContext';
 
 
 
@@ -41,71 +43,124 @@ const LeaveTable = ({ applications }: { applications: QueryResultRow[] }) => {
   );
 };
 
-export const LeaveTableDetails = ({ applications }: { applications: QueryResultRow[] }) => {
+export const LeaveTableDetails = ({ username, organisationid, leavetype, to, from }: { username: string | undefined | null, organisationid: string | undefined | null, leavetype: string, to: string, from: string }) => {
+  const [applications, setApplications] = useState<QueryResultRow[] | null>(null);
+  const getApplications = () => getFilteredApplicationsForUser(username, leavetype, organisationid, to, from)
+
+  const { data, isError, isLoading, error } = useQuery(
+    [username, organisationid, leavetype, from, to, 'leave-applications'],
+    getApplications,
+    {
+      enabled: !!username,
+    }
+  );
+
+  useEffect(() => {
+    console.log(username)
+    console.log(organisationid)
+    console
+    if (!isLoading && data) {
+      setApplications(data);
+      console.log(data)
+    }
+  }, [username, organisationid, data, isLoading, from, to, leavetype])
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Start Date</TableCell>
-            <TableCell>End Date</TableCell>
-            <TableCell>Total Days</TableCell>
-            <TableCell>Leave Type</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Application Date</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {applications.map((leave) => (
-            <TableRow key={leave.id}>
-              <TableCell>{format(leave.startdate, "EEEE dd MMMM yyyy")}</TableCell>
-              <TableCell>{format(leave.enddate, "EEEE dd MMMM yyyy")}</TableCell>
-              <TableCell>{leave.totaldays}</TableCell>
-              <TableCell>{leave.leavetype}</TableCell>
-              <TableCell>{leave.status}</TableCell>
-              <TableCell>{format(leave.applicationdate, "EEEE dd MMMM yyyy")}</TableCell>
+    <>
+      {applications && applications.length > 0 ? (<TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Start Date</TableCell>
+              <TableCell>End Date</TableCell>
+              <TableCell>Total Days</TableCell>
+              <TableCell>Leave Type</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Application Date</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {applications?.map((leave) => (
+              <TableRow key={leave.id}>
+                <TableCell>{format(leave.startdate, "EEEE dd MMMM yyyy")}</TableCell>
+                <TableCell>{format(leave.enddate, "EEEE dd MMMM yyyy")}</TableCell>
+                <TableCell>{leave.totaldays}</TableCell>
+                <TableCell>{leave.leavetype}</TableCell>
+                <TableCell>{leave.status}</TableCell>
+                <TableCell>{format(leave.applicationdate, "EEEE dd MMMM yyyy")}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>) : (
+        <NoDataFound message='No applications found' />
+      )}
+    </>
+
   );
 };
-export const PendingLeaveTableDetails = ({ applications }: { applications: QueryResultRow[] }) => {
+export const PendingLeaveTableDetails = () => {
+  const [applications, setApplications] = useState<QueryResultRow[] | null>(null);
+  const { username, name, role, organisation, organisationid, setName, setOrganisation, setRole, setUsername, setOrganisationId } = useUserContext();
+  const getApplications = () => getPendingApplicationByUsername(username, organisationid)
+
+  const { data, isError, isLoading, error } = useQuery(
+    [username, 'pending-leave-applications'],
+    getApplications,
+    {
+      enabled: !!username,
+    }
+  );
+  useEffect(() => {
+    console.log(username);
+    console.log(organisationid)
+    if (!isLoading && data) {
+      setApplications(data);
+    }
+  }, [username, organisationid, isLoading, data])
+  if (isLoading) {
+    return <CircularProgressSpinner message="Loading Applications" />
+  }
+  if (isError) {
+    return (
+      <ErrorOccured message={(error as Error).message} />
+    )
+  }
   const router = useRouter();
 
   const handleRedirect = (url: string) => {
     router.push(url);
   };
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Start Date</TableCell>
-            <TableCell>End Date</TableCell>
-            <TableCell>Total Days</TableCell>
-            <TableCell>Leave Type</TableCell>
-            <TableCell>Application Date</TableCell>
-            <TableCell>Action</TableCell>
+    <>{applications && applications?.length > 0 ? (
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Start Date</TableCell>
+              <TableCell>Total Days</TableCell>
+              <TableCell>Action</TableCell>
 
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {applications.map((leave) => (
-            <TableRow key={leave.id}>
-              <TableCell>{format(leave.startdate, "EEEE dd MMMM yyyy")}</TableCell>
-              <TableCell>{format(leave.enddate, "EEEE dd MMMM yyyy")}</TableCell>
-              <TableCell>{leave.totaldays}</TableCell>
-              <TableCell>{leave.leavetype}</TableCell>
-              <TableCell>{format(leave.applicationdate, "EEEE dd MMMM yyyy")}</TableCell>
-              <Link href={`/leave-applications//user/${leave.id}`}><Button >View</Button></Link>
+            </TableRow >
+          </TableHead >
+          <TableBody>
+            {applications?.map((leave) => (
+              <TableRow key={leave.id}>
+                <TableCell>{format(leave.startdate, "EEEE dd MMMM yyyy")}</TableCell>
+                <TableCell>{leave.totaldays}</TableCell>
+                <Link href={`/leave-applications//user/${leave.id}`}><Button size="small" >View</Button></Link>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table >
+      </TableContainer >
+    )
+      : (
+        <NoDataFound message={"You dont have any pending leave applicatios"} />
 
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+
+      )}</>
+
+
   );
 };
 
@@ -207,7 +262,7 @@ export const LeaveTableReportGrouped = ({ organisation }: { organisation: string
     if (!isLoading) {
       setApplications(data)
     }
-  })
+  }, [data, isLoading])
   if (isLoading) {
     return <CircularProgressSpinner message="Loading Applications" />
   }
@@ -248,9 +303,8 @@ export const LeaveTableReportGroupedByLeaveType = ({ organisation }: { organisat
   useEffect(() => {
     if (!isLoading) {
       setApplications(data)
-      console.log("leave type", data)
     }
-  })
+  }, [data, isLoading])
   if (isLoading) {
     return <CircularProgressSpinner message="Loading Applications" />
   }

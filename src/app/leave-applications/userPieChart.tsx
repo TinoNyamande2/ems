@@ -15,7 +15,6 @@ export const UserPieChart = ({ username, organisation }: { username: string | nu
     const { isLoading, data, error, isError } = useQuery(["user-pie-chart-data", username, organisation], () => getApplicationsByLeaveTypeForUser(username, organisation))
     useEffect(() => {
         if (!isLoading && data) {
-            console.log("Pie data", data)
             setApplicationData(data)
             if (applicationData) {
 

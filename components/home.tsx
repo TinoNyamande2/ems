@@ -1,30 +1,25 @@
 "use client"
-import Image from "next/image";
 import { useEffect } from "react";
-import { getServerSession } from 'next-auth';
 import { redirect, useRouter } from 'next/navigation'
-import { authOptions } from "./../lib/authOptions";
-import { SessionProvider, signIn, signOut, useSession } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import * as React from 'react';
 import { alpha } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import LatestApplications, { OnLeaveApplications } from "./leaveapplication/latestLeaveApplications";
 import { Notifications } from "./misc/Notifications";
 import { getUserByEmail } from "@/data/user";
 import { QueryResultRow } from "@vercel/postgres";
 import { useQuery } from "react-query";
-import { createCompany, getCompanyByEmail } from "@/data/company";
+import { createCompany } from "@/data/company";
 import { AddCompanyModal } from "./org/addCompanyModal";
 import { CompanyCreate } from "@/interfaces/company";
 import { InviteMemberModal } from "./org/inviteMemberModal";
 import { createInvite } from "@/data/invites";
-import { CircularProgressSpinner, SmallCircularProgressSpinner } from "./misc/CircularProgress";
+import { CircularProgressSpinner } from "./misc/CircularProgress";
 import { ErrorOccured } from "./misc/ErrorOccured";
 import { ToastNotificationError, ToastNotificationSuccess } from "./misc/ToastNotification";
 import { useState } from "react";
@@ -42,7 +37,7 @@ export default function Home() {
   const [successToastOpen, setSuccessToastOpen] = useState(false);
   const [successToastMessage, setSuccessToastMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const { setUsername, setOrganisation, setRole, setName } = useUserContext();
+  const {username,name,role,organisation,setName,setOrganisation,setRole,setUsername,setOrganisationId} = useUserContext();
 
   const handleClick = () => setOpen(!open);
   const handleToastClick = () => {
@@ -98,11 +93,15 @@ export default function Home() {
   );
 
   useEffect(() => {
-    console.log(user)
     if (!isLoading) {
       setUser(data)
+      setUsername(data?.useremail || "");
+      setName(data?.username || "");
+      setRole(data?.role || "");
+      setOrganisation(data?.organisationname || "");
+      setOrganisationId(data?.organisationid||"")
     }
-  }, [session, isLoading, data,user]);
+  }, [session, isLoading, data, user]);
 
   if (!session) {
     redirect("/login");
@@ -235,8 +234,27 @@ export default function Home() {
               </Box>
             </Box>
           </Container>
-        ) : (
-          <Button onClick={() => setOpen(true)}>Create company</Button>
+        ) : (<>
+          <Typography
+            variant="h1"
+            sx={{
+              fontSize: '1.5em',
+              flexGrow: "1",
+            }}
+          >
+            {session.user?.name}
+          </Typography>
+          <Box
+            textAlign="center"
+            color="text.secondary"
+            display='flex'
+            flexDirection="row"
+            width="100%"
+            sx={{ alignSelf: 'center', width: { sm: '100%', md: '80%' }, flexGrow: "1" }}
+          >
+            <Button onClick={() => setOpen(true)}>Create company</Button>
+
+          </Box></>
         )}
         <AddCompanyModal onAddCompany={handleAddCompany} open={open} onModalClose={handleClick} />
         <InviteMemberModal memberModalOpen={memberModalOpen} onInviteMember={handleInviteMember} onModalClose={handleMemberModalClick} />

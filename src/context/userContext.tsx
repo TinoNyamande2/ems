@@ -10,10 +10,12 @@ interface UserContextProps {
     name: string;
     role: string;
     organisation: string;
+    organisationid:string,
     setUsername: (username: string) => void;
     setName: (name: string) => void;
     setOrganisation: (organisation: string) => void;
     setRole: (role: string) => void;
+    setOrganisationId :(organisationid:string)=>void;
 }
 
 const userContextPropsDefaultValues: UserContextProps = {
@@ -21,10 +23,12 @@ const userContextPropsDefaultValues: UserContextProps = {
     name: "",
     role: "",
     organisation: "",
+    organisationid:"",
     setUsername: () => { },
     setName: () => { },
     setOrganisation: () => { },
-    setRole: () => { }
+    setRole: () => { },
+    setOrganisationId :()=>{}
 };
 
 const UserContext = createContext<UserContextProps>(userContextPropsDefaultValues);
@@ -39,6 +43,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const [role, setRole] = useState<string>(userContextPropsDefaultValues.role);
     const [organisation, setOrganisation] = useState<string>(userContextPropsDefaultValues.organisation);
     const [user, setUser] = useState<QueryResultRow | undefined>(undefined);
+    const [organisationid, setOrganisationId] = useState<string>(userContextPropsDefaultValues.organisationid);
 
     const { data: session } = useSession();
     const useremail = session?.user?.email || '';
@@ -49,26 +54,22 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         }
     };
 
-    const { data, isError, isLoading } = useQuery(['user', useremail], fetchUser, {
+    const { data, isLoading } = useQuery(['user', useremail], fetchUser, {
         enabled: !!useremail,
     });
 
     useEffect(() => {
         if (data && !isLoading) {
-            setUsername(data?.email || "");
-            setName(data?.name || "");
+            setUsername(data?.useremail || "");
+            setName(data?.username || "");
             setRole(data?.role || "");
-            setOrganisation(data?.organisation || "");
-
-            localStorage.setItem('username', data?.email || "");
-            localStorage.setItem('name', data?.name || "");
-            localStorage.setItem('role', data?.role || "");
-            localStorage.setItem('organisation', data?.organisation || "");
+            setOrganisation(data?.organisationname || "");
+            setOrganisationId(data?.organisationid||"")
         }
     }, [data, isLoading]);
 
     return (
-        <UserContext.Provider value={{ username, name, role, organisation, setUsername, setName, setOrganisation, setRole }}>
+        <UserContext.Provider value={{ username, name, role, organisation,organisationid, setUsername, setName, setOrganisation, setRole,setOrganisationId }}>
             {children}
         </UserContext.Provider>
     );

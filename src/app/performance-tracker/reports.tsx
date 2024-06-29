@@ -21,7 +21,7 @@ export default function Reports({ organisation, username, name }: { organisation
         params.delete('startDate');
         params.delete('endDate');
         replace(`${pathname}?${params.toString()}`);
-    }, [pathname,searchParams])
+    }, [pathname,searchParams,replace])
     return (
         <Box>
             <Box sx={{ marginTop: "3vh" }}>

@@ -10,7 +10,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { addWeeks, subWeeks } from "date-fns";
 
 
-export default function UserSearch({ placeholder }: { placeholder: string }) {
+export default function UserSearch({ placeholder,onClose }: { placeholder: string,onClose:()=>void }) {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const [startDate, setStartDate] = useState("")
@@ -58,6 +58,7 @@ export default function UserSearch({ placeholder }: { placeholder: string }) {
             params.delete('to');
         }
         replace(`${pathname}?${params.toString()}`);
+        onClose();
     }
     const handleClear = () => {
         const params = new URLSearchParams(searchParams);
@@ -73,9 +74,9 @@ export default function UserSearch({ placeholder }: { placeholder: string }) {
     return (
         <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "space-around", width: "100%" }}>
 
-            <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-around", width: "100%" }}>
+            <Box sx={{ display: "flex", flexDirection: { sm: "row", xs: "column" }, justifyContent: "space-around", width: "100%" }}>
 
-  
+
 
                 <Box sx={{ display: "flex", flexDirection: "column", width: "100%", marginRight: 2 }}>
                     <label htmlFor="from-date">From</label>
@@ -118,6 +119,7 @@ export default function UserSearch({ placeholder }: { placeholder: string }) {
                     >
                         Search
                     </Button>
+
                 </Box>
             </Box>
 

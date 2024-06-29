@@ -1,29 +1,41 @@
 "use client";
 import { LeaveApplicationCreate, LeaveApplicationCreateDefaultValues } from '@/interfaces/leaveapplications';
 import React, { ChangeEvent, SyntheticEvent, useEffect, useState } from 'react';
-import "./../globals.css";
 import { CreateLeaveApplicationForm } from '@/data/leaveapplications';
-import { CircularProgressSpinner } from '../../../components/misc/CircularProgress';
-import { ToastNotificationError, ToastNotificationSuccess } from '../../../components/misc/ToastNotification';
+import { CircularProgressSpinner } from '../../../../components/misc/CircularProgress';
+import { ToastNotificationError, ToastNotificationSuccess } from '../../../../components/misc/ToastNotification';
 import { Box, Typography } from '@mui/material';
+import "./../../globals.css"
+import { useUserContext } from '@/context/userContext';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
-export default function LeaveForm({organisation,username}:{organisation:string|null|undefined,username:string|null|undefined}) {
+export default function LeaveForm() {
     const [formData, setFormData] = useState<LeaveApplicationCreate>(LeaveApplicationCreateDefaultValues);
     const [errors, setErrors] = useState<LeaveApplicationCreate>(LeaveApplicationCreateDefaultValues);
     const [isSaving, setIsSaving] = useState(false);
     const [open, setOpen] = useState(false);
     const [errorToastOpen, setErrorToastOpen] = useState(false);
     const [errorSavingData, setErrorSavingData] = useState("");
+    const router = useRouter();
+    const { data: session } = useSession();
+    const {username,name,role,organisation,organisationid,setName,setOrganisation,setRole,setUsername,setOrganisationId} = useUserContext();
+
 
     const handleClick = () => {
         setOpen(false);
         setErrorToastOpen(false);
     };
 
+    // useEffect(() => {
+    // }, [organisationid, username]);
+
     useEffect(() => {
-        console.log(organisation);
-        console.log(username);
-    }, [organisation, username]);
+        if (!session) {
+            let redirectUrl = "/leave-applications/apply";
+            router.push(`login?redirectUrl=${redirectUrl}`);
+        }
+    }, [session, router]);
 
     const handleSubmit = async (event: SyntheticEvent) => {
         event.preventDefault();
@@ -39,9 +51,20 @@ export default function LeaveForm({organisation,username}:{organisation:string|n
             setErrors((prevErrors) => ({ ...prevErrors, leavetype: 'Leave Type is required' }));
             return;
         }
+        if (formData.startdate && formData.enddate) {
+            const startDate = new Date(formData.startdate);
+            const endDate = new Date(formData.enddate);
+            if (startDate >= endDate) {
+                setErrors((prevErrors) => ({ ...prevErrors, startdate: 'Start Date must be earlier than End Date' }));
+                setErrors((prevErrors) => ({ ...prevErrors, enddate: 'End Date must be later than Start Date'}));
+                return
+            }
+        }
         setIsSaving(true);
         try {
-            await CreateLeaveApplicationForm(formData);
+            console.log("Sub")
+           // await CreateLeaveApplicationForm(formData);
+           console.log(formData)
             setOpen(true);
             setFormData(LeaveApplicationCreateDefaultValues);
         } catch (error) {
@@ -59,7 +82,7 @@ export default function LeaveForm({organisation,username}:{organisation:string|n
             username: username,
             applicationdate: new Date().toISOString(),
             status: 'NEW',
-            organisationid: organisation,
+            organisationid: organisationid,
         }));
         setErrors(LeaveApplicationCreateDefaultValues);
     };

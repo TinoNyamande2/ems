@@ -38,7 +38,7 @@ const AddWorkItemModal: React.FC<AddWorkItemModalProps> = ({ isOpen, onRequestCl
 
         fetchProject();
         fetchTags();
-    }, []);
+    }, [organisation]);
 
   
 

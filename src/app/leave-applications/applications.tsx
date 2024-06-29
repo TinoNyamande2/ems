@@ -1,60 +1,69 @@
-"use client"
-import { useEffect, useState } from "react"
-import LeaveTable, { LeaveTableDetails } from "./tabledata"
-import { QueryResultRow } from "@vercel/postgres"
+"use client";
+import { useEffect, useState } from "react";
+import LeaveTable, { LeaveTableDetails } from "./tabledata";
+import { QueryResultRow } from "@vercel/postgres";
 import { getApplicationByUsername, getFilteredApplicationsForUser } from "@/data/leaveapplications";
 import { useSession } from "next-auth/react";
 import { useQuery } from "react-query";
 import { CircularProgressSpinner } from "../../../components/misc/CircularProgress";
 import { NoDataFound } from "../../../components/misc/NoDataFound";
 import { ErrorOccured } from "../../../components/misc/ErrorOccured";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import UserSearch from "./usersearch";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { UserPieChart } from "./userPieChart";
+import Link from "next/link";
+import { getUserByEmail } from "@/data/user";
+import { useUserContext } from "@/context/userContext";
 
-export default function Applications({ username, organisation }: { username: string | null | undefined, organisation: string | null | undefined }) {
-
+export default function Applications() {
+    const { data: session } = useSession();
+    const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
     const searchParams = useSearchParams();
     const from = searchParams.get('from') || "";
     const to = searchParams.get("to") || "";
     const leavetype = searchParams.get("leavetype") || "";
-    const [applications, setApplications] = useState<QueryResultRow[] | null>(null);
-    const getApplications = () => getFilteredApplicationsForUser(username, leavetype, organisation, to, from)
-    const { data, isError, isLoading, error } = useQuery(
-        [username, organisation, leavetype, from, to, 'leave-applications'],
-        getApplications,
-        {
-            enabled: !!username,
-        }
-    );
+    const {username,name,role,organisation,organisationid,setName,setOrganisation,setRole,setUsername,setOrganisationId} = useUserContext();
+
+
+    const router = useRouter();
+
     useEffect(() => {
-        if (!isLoading && data) {
-            setApplications(data);
+        if (!session) {
+            let redirectUrl = "/leave-applications";
+            router.push(`login?redirectUrl=${redirectUrl}`);
         }
-    }, [username, organisation, data, isLoading, from, to, leavetype])
-    if (isLoading) {
-        return <CircularProgressSpinner message="Loading Applications" />
-    }
-    if (isError) {
-        return (
-            <ErrorOccured message={(error as Error).message} />
-        )
-    }
+    }, [session, router]);
+
+  
 
     return (
         <>
-            <Box sx={{ marginTop: "3vh",marginBottom:"5vh" }}>
-                <Typography sx={{ fontWeight: "bold", fontSize: "1.6em", textAlign: "center" }} >My Leave Applications</Typography>
-            </Box>
             <Box sx={{ paddingTop: "3vh", width: "80%", marginLeft: "auto", marginRight: "auto", marginBottom: "5vh" }}>
-                <UserSearch placeholder="" />
+                {showSearchBar && <UserSearch placeholder="" onClose={() => setShowSearchBar(false)} />}
+                <Button
+                    onClick={() => setShowSearchBar((prev) => !prev)}
+                    size="small"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    sx={{ marginBottom: 2, marginTop: 1 }}
+                >
+                    {showSearchBar ? "Close Search Bar" : "Open Search Bar"}
+                </Button>
             </Box>
-            <Box sx={{ paddingTop: "3vh", width: "80%", marginLeft: "auto", marginRight: "auto", marginBottom: "5vh" }}> 
-                <UserPieChart username={username} organisation={organisation} />
+            <Box sx={{ display: "flex", flexDirection: { sm: "row", xs: "column" }, gap: 2 }}>
+                <Link style={{ flex: "1" }} href="/leave-applications/apply">
+                    <Button fullWidth variant="contained">Apply</Button>
+                </Link>
+                <Link style={{ flex: "1" }} href="/leave-applications/pending">
+                    <Button fullWidth variant="contained">View Pending Applications</Button>
+                </Link>
             </Box>
-            {applications && applications?.length > 0 && !isLoading ? (<LeaveTableDetails applications={applications} />
-            ) : (<NoDataFound message={"You dont have any leave applicatios"} />)}
+            <Box sx={{ paddingTop: "3vh", width: { sm: "800px", xs: "100%" }, marginLeft: "auto", marginRight: "auto", marginBottom: "5vh" }}>
+                {<UserPieChart username={username} organisation={organisationid} />}
+            </Box>
+            {<LeaveTableDetails username={username} organisationid={organisationid} leavetype={leavetype} to={to} from={from} />}
         </>
-    )
+    );
 }
