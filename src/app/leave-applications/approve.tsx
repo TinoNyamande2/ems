@@ -1,3 +1,4 @@
+"use client"
 import { getAllNewApplication, getApplicationByUsername } from "@/data/leaveapplications";
 import { QueryResultRow } from "@vercel/postgres";
 import { useState, useEffect } from "react";
@@ -9,11 +10,13 @@ import { ErrorOccured } from "../../../components/misc/ErrorOccured";
 import { useSession } from "next-auth/react";
 import { getUserByEmail } from "@/data/user";
 import { Box, Typography } from "@mui/material";
+import { useUserContext } from "@/context/userContext";
 
-export default function Approve({ organisation }: { organisation: string | null | undefined }) {
+export default function Approve() {
     const [applications, setApplications] = useState<QueryResultRow[] | null>(null);
-    const getApplications = () => getAllNewApplication(organisation);
-    const { data, isError, isLoading, error } = useQuery(['new-leave-applications', organisation], getApplications,);
+    const {organisationid} = useUserContext()
+    const getApplications = () => getAllNewApplication(organisationid);
+    const { data, isError, isLoading, error } = useQuery(['new-leave-applications', organisationid], getApplications,);
     useEffect(() => {
         if (!isLoading && data) {
             setApplications(data);
@@ -29,9 +32,6 @@ export default function Approve({ organisation }: { organisation: string | null 
     }
     return (
         <>
-            <Box sx={{ marginTop: "3vh" }}>
-                <Typography sx={{ fontWeight: "bold", fontSize: "1.6em", textAlign: "center" }} >Approve Leave Applications</Typography>
-            </Box>
             {applications && applications?.length > 0 && !isLoading ? (<LeaveTable applications={applications} />
             ) : (<NoDataFound message={"You dont have any leave applicatios"} />)}
         </>

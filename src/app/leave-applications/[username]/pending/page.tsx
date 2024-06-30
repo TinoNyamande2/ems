@@ -1,6 +1,6 @@
-import { PendingLeaveTableDetails } from "../tabledata";
+import { PendingLeaveTableDetails } from "../../tabledata";
 import { Box } from "@mui/material";
-import { PageHeader } from "../../../../components/nav/pageHeader";
+import { PageHeader } from "../../../../../components/nav/pageHeader";
 import { Metadata } from "next";
 export const metadata: Metadata = {
     title: {

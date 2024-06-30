@@ -26,17 +26,6 @@ export default function Applications() {
     const {username,name,role,organisation,organisationid,setName,setOrganisation,setRole,setUsername,setOrganisationId} = useUserContext();
 
 
-    const router = useRouter();
-
-    useEffect(() => {
-        if (!session) {
-            let redirectUrl = "/leave-applications";
-            router.push(`login?redirectUrl=${redirectUrl}`);
-        }
-    }, [session, router]);
-
-  
-
     return (
         <>
             <Box sx={{ paddingTop: "3vh", width: "80%", marginLeft: "auto", marginRight: "auto", marginBottom: "5vh" }}>
@@ -53,12 +42,18 @@ export default function Applications() {
                 </Button>
             </Box>
             <Box sx={{ display: "flex", flexDirection: { sm: "row", xs: "column" }, gap: 2 }}>
-                <Link style={{ flex: "1" }} href="/leave-applications/apply">
+                <Link style={{ flex: "1" }} href={`/leave-applications/${name}/apply`}>
                     <Button fullWidth variant="contained">Apply</Button>
                 </Link>
-                <Link style={{ flex: "1" }} href="/leave-applications/pending">
+                <Link style={{ flex: "1" }} href={`/leave-applications/${name}/pending`}>
                     <Button fullWidth variant="contained">View Pending Applications</Button>
                 </Link>
+                {role==='admin' && <Link style={{ flex: "1" }} href={`/leave-applications/${name}/approve`}>
+                    <Button fullWidth variant="contained">Approve Applications</Button>
+                </Link>}
+                {role==='admin' && <Link style={{ flex: "1" }} href={`/leave-applications/${name}/reports`}>
+                    <Button fullWidth variant="contained">Leave Reports</Button>
+                </Link>}
             </Box>
             <Box sx={{ paddingTop: "3vh", width: { sm: "800px", xs: "100%" }, marginLeft: "auto", marginRight: "auto", marginBottom: "5vh" }}>
                 {<UserPieChart username={username} organisation={organisationid} />}

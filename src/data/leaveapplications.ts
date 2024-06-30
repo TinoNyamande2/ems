@@ -357,24 +357,30 @@ export const getFilteredApplicationsForAdmin = async (
   user: string | undefined | null,
   leavetype: string | undefined | null,
   organisation: string | null | undefined,
+  groupBy:string|null|undefined
 ) => {
+  
   try {
-    if (user && leavetype) {
+    if(groupBy === 'User') {
+       const data = await sql`SELECT b.email ,b.name as label,SUM(CAST(a.totaldays AS DOUBLE PRECISION)) AS value FROM leaveapplication a JOIN users b ON a.username = b.email GROUP BY b.email , b.name `
+       return data.rows
+    }  else if(groupBy === 'Leave Type') {
+      const data = await sql`SELECT leavetype as label ,SUM(CAST(totaldays AS DOUBLE PRECISION)) AS value FROM leaveapplication GROUP BY leavetype `
+      return data.rows
+   } else if (!groupBy && user && leavetype) {
       const data =
-        await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email  WHERE a.leavetype ILIKE ${`%${leavetype}%`} AND b.name LIKE ${`%${user}%`} AND a.organisation = ${organisation}`;
+        await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email  WHERE a.leavetype ILIKE ${`%${leavetype}%`} AND b.name ILIKE ${`%${user}%`} AND a.organisation = ${organisation}`;
       return data.rows;
-    } else if (user && !leavetype) {
-      const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email  WHERE  b.name LIKE ${`%${user}%`} AND a.organisation = ${organisation}`;
+    } else if (!groupBy && user && !leavetype) {
+      const data = await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email  WHERE  b.name ILIKE ${`%${user}%`} AND a.organisation = ${organisation}`;
       return data.rows;
-    } else if (!user && leavetype) {
+    } else if (!groupBy && !user && leavetype) {
       const data =
       await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email  WHERE a.leavetype ILIKE ${`%${leavetype}%`}  AND a.organisation = ${organisation}`;
       return data.rows;
     } else {
-      console.log("No params")
       const data =
       await sql`SELECT a.*,b.name FROM leaveapplication a JOIN users b ON a.username = b.email  WHERE  a.organisation = ${organisation}`;
-      console.log(data.rows)
       return data.rows;
     }
   } catch (error) {

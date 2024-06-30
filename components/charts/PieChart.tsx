@@ -11,21 +11,21 @@ interface ProjectGraph {
 
 export const CustomPieChart = ({ data }: { data: ProjectGraph[] }) => {
   const totalValue = data.reduce((acc, item) => acc + item.value, 0);
-
-  const dataWithPercentages = data.map(item => ({
-    ...item,
-    label: `${item.label} (${((item.value / totalValue) * 100).toFixed(2)}%)`
-  }));
-
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const dataWithPercentages = data.map(item => ({
+    ...item,
+    label:isSmallScreen? `${item.label}`:`${item.label} (${((item.value / totalValue) * 100).toFixed(2)}%)` 
+  }));
+
+ 
 
   return (
     <Box
       sx={{
-        width: '100%',
-        maxWidth: isSmallScreen ? '100%' : '800px',
-        margin: '0 auto',
+        width: '50%',
+        maxWidth: isSmallScreen ? '40%' : '700px',
+        margin: '0',
       }}
     >
       <PieChart

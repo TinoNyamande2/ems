@@ -11,20 +11,22 @@ import { NoDataFound } from '../../../components/misc/NoDataFound';
 import { CircularProgressSpinner } from '../../../components/misc/CircularProgress';
 import { ErrorOccured } from '../../../components/misc/ErrorOccured';
 import { useUserContext } from '@/context/userContext';
+import { tableHead } from '../../../components/styyle';
 
 
 
 const LeaveTable = ({ applications }: { applications: QueryResultRow[] }) => {
+  const {name} = useUserContext()
   return (
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Username</TableCell>
-            <TableCell>Total Days</TableCell>
-            <TableCell>Leave Type</TableCell>
-            <TableCell>Application Date</TableCell>
-            <TableCell>Action</TableCell>
+            <TableCell sx={tableHead} >Username</TableCell>
+            <TableCell sx={tableHead}>Total Days</TableCell>
+            <TableCell sx={tableHead}>Leave Type</TableCell>
+            <TableCell sx={tableHead}>Application Date</TableCell>
+            <TableCell sx={tableHead}>Action</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -34,7 +36,7 @@ const LeaveTable = ({ applications }: { applications: QueryResultRow[] }) => {
               <TableCell>{leave.totaldays}</TableCell>
               <TableCell>{leave.leavetype}</TableCell>
               <TableCell>{format(leave.applicationdate, "EEEE dd MMMM yyyy")}</TableCell>
-              <Link href={`/leave-applications/${leave.id}`}><Button >View</Button></Link>
+              <Link href={`/leave-applications/${name}/approve/${leave.id}`}><Button >View</Button></Link>
             </TableRow>
           ))}
         </TableBody>
@@ -147,7 +149,7 @@ export const PendingLeaveTableDetails = () => {
               <TableRow key={leave.id}>
                 <TableCell>{format(leave.startdate, "EEEE dd MMMM yyyy")}</TableCell>
                 <TableCell>{leave.totaldays}</TableCell>
-                <Link href={`/leave-applications//user/${leave.id}`}><Button size="small" >View</Button></Link>
+                <Link href={`/leave-applications/${name}/pending/${leave.id}`}><Button size="small" >View</Button></Link>
               </TableRow>
             ))}
           </TableBody>
@@ -223,14 +225,14 @@ export const LeaveTableReport = ({ applications }: { applications: QueryResultRo
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Application Date</TableCell>
-              <TableCell>User</TableCell>
-              <TableCell>Start Date</TableCell>
-              <TableCell>End Date</TableCell>
-              <TableCell>Total Days</TableCell>
-              <TableCell>Leave Type</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Application Date</TableCell>
+              <TableCell sx={tableHead} >Application Date</TableCell>
+              <TableCell sx={tableHead}>User</TableCell>
+              <TableCell sx={tableHead}>Start Date</TableCell>
+              <TableCell sx={tableHead}>End Date</TableCell>
+              <TableCell sx={tableHead}>Total Days</TableCell>
+              <TableCell sx={tableHead}>Leave Type</TableCell>
+              <TableCell sx={tableHead}>Status</TableCell>
+              <TableCell sx={tableHead}>Application Date</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -255,36 +257,21 @@ export const LeaveTableReport = ({ applications }: { applications: QueryResultRo
 
   );
 };
-export const LeaveTableReportGrouped = ({ organisation }: { organisation: string | null | undefined }) => {
-  const [applications, setApplications] = useState<QueryResultRow | undefined>(undefined)
-  const { data, isLoading, error, isError } = useQuery(["report", "users"], () => getLeaveDaysGroupedByUser(organisation))
-  useEffect(() => {
-    if (!isLoading) {
-      setApplications(data)
-    }
-  }, [data, isLoading])
-  if (isLoading) {
-    return <CircularProgressSpinner message="Loading Applications" />
-  }
-  if (isError) {
-    return (
-      <ErrorOccured message={(error as Error).message} />
-    )
-  }
+export const LeaveTableReportGrouped = ({ applications,groupBy }: { applications: QueryResultRow[] | undefined,groupBy:string }) => {
   return (
     <>
-      {applications && applications?.length > 0 && !isLoading ? (<TableContainer component={Paper}>
+      {applications && applications?.length > 0 ?(<TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>User</TableCell>
-              <TableCell>Total Days</TableCell>
+              <TableCell sx={tableHead} >{groupBy}</TableCell>
+              <TableCell sx={tableHead}>Total Days</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {applications?.map((leave: any) => (
               <TableRow key={leave.id}>
-                <TableCell>{leave.name}</TableCell>
+                <TableCell>{leave.label}</TableCell>
                 <TableCell>{leave.value}</TableCell>
               </TableRow>
             ))}
@@ -297,50 +284,7 @@ export const LeaveTableReportGrouped = ({ organisation }: { organisation: string
 
   );
 };
-export const LeaveTableReportGroupedByLeaveType = ({ organisation }: { organisation: string | null | undefined }) => {
-  const [applications, setApplications] = useState<QueryResultRow | undefined>(undefined)
-  const { data, isLoading, isError, error } = useQuery(["report", "leave type"], () => getLeaveDaysGroupedByLeaveType(organisation))
-  useEffect(() => {
-    if (!isLoading) {
-      setApplications(data)
-    }
-  }, [data, isLoading])
-  if (isLoading) {
-    return <CircularProgressSpinner message="Loading Applications" />
-  }
-  if (isError) {
-    return (
-      <ErrorOccured message={(error as Error).message} />
-    )
-  }
-  return (
-    <>
-      {applications && applications?.length > 0 && !isLoading ? (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Leave Type</TableCell>
-                <TableCell>Total Days</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {applications?.map((leave: any) => (
-                <TableRow key={leave.id}>
-                  <TableCell>{leave.leavetype}</TableCell>
-                  <TableCell>{leave.value}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      ) : (<NoDataFound message={"No data found"} />
-      )}
-    </>
 
-  );
-
-};
 
 
 

@@ -1,8 +1,9 @@
 
 import { Box } from "@mui/material";
-import Applications from "./applications";
-import { PageHeader } from "../../../components/nav/pageHeader";
+import Applications from "../applications";
+import { PageHeader } from "../../../../components/nav/pageHeader";
 import type { Metadata } from 'next'
+import { pageContainer } from "../../../../components/styyle";
 
 export const metadata: Metadata = {
   title: {
@@ -17,16 +18,7 @@ export default function Page() {
   return (
     <Box
       id="image"
-      sx={{
-        mt: { xs: 8, sm: 2 },
-        alignSelf: 'center',
-        height: "auto",
-        width: '100%',
-        backgroundSize: 'cover',
-        borderRadius: '10px',
-        outline: '1px solid',
-        boxShadow:`0 0 12px 8px lightgray`
-      }}
+      sx={pageContainer}
     >
       <Box>
         <PageHeader message="My Leave applications" />

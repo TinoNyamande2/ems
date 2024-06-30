@@ -37,7 +37,7 @@ export default function Home() {
   const [successToastOpen, setSuccessToastOpen] = useState(false);
   const [successToastMessage, setSuccessToastMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const {username,name,role,organisation,setName,setOrganisation,setRole,setUsername,setOrganisationId} = useUserContext();
+  const { username, name, role, organisation, setName, setOrganisation, setRole, setUsername, setOrganisationId } = useUserContext();
 
   const handleClick = () => setOpen(!open);
   const handleToastClick = () => {
@@ -99,13 +99,11 @@ export default function Home() {
       setName(data?.username || "");
       setRole(data?.role || "");
       setOrganisation(data?.organisationname || "");
-      setOrganisationId(data?.organisationid||"")
+      setOrganisationId(data?.organisationid || "")
     }
-  }, [session, isLoading, data, user]);
+  }, [session, isLoading, data, user, setName, setOrganisation, setOrganisationId, setRole, setUsername]);
 
-  if (!session) {
-    redirect("/login");
-  }
+
 
   if (isError) {
     return <ErrorOccured message={(error as Error).message} />;
@@ -128,7 +126,7 @@ export default function Home() {
       >
         <ToastNotificationSuccess message={successToastMessage} isOpen={successToastOpen} handleClick={handleToastClick} duration={4000} />
         <ToastNotificationError message={errorToastMessage} isOpen={errorToastOpen} handleClick={handleToastClick} duration={4000} />
-        {user?.organisationname ? (
+        {user?.organisationname &&
           <Container
             sx={{
               display: 'flex',
@@ -234,7 +232,8 @@ export default function Home() {
               </Box>
             </Box>
           </Container>
-        ) : (<>
+        }
+        {user && !user.organisationname && <>
           <Typography
             variant="h1"
             sx={{
@@ -242,7 +241,7 @@ export default function Home() {
               flexGrow: "1",
             }}
           >
-            {session.user?.name}
+            {session?.user?.name}
           </Typography>
           <Box
             textAlign="center"
@@ -254,8 +253,10 @@ export default function Home() {
           >
             <Button onClick={() => setOpen(true)}>Create company</Button>
 
-          </Box></>
-        )}
+          </Box>
+        </>
+        }
+
         <AddCompanyModal onAddCompany={handleAddCompany} open={open} onModalClose={handleClick} />
         <InviteMemberModal memberModalOpen={memberModalOpen} onInviteMember={handleInviteMember} onModalClose={handleMemberModalClick} />
       </Box>
