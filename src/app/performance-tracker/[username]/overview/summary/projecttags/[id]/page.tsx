@@ -7,8 +7,10 @@ import { useQuery } from "react-query"
 import { useSession } from "next-auth/react";
 import { getUserByEmail } from "@/data/user";
 import { useSearchParams } from "next/navigation";
-import { PerformanceSummaryForUserPerProject } from "../../../../../../components/performancetracker/user/userSummaryTables"
-import { PerformanceSummaryForAdminPerProject } from "../../../../../../components/performancetracker/admin/adminSummaryTables"
+import { PerformanceSummaryForUserPerProject } from "../../../../../../../../components/performancetracker/user/userSummaryTables"
+import { PerformanceSummaryForAdminPerProject, PerformanceSummaryForAdminPerProjectTag } from "../../../../../../../../components/performancetracker/admin/adminSummaryTables"
+import { PageHeader } from "../../../../../../../../components/nav/pageHeader"
+import { pageContainer } from "../../../../../../../../components/styyle"
 
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -35,12 +37,12 @@ export default function Page({ params }: { params: { id: string } }) {
         }
     }, [session, isLoading, data])
     return (
-        <Box>
-            <Box sx={{ marginTop: "3vh" }}>
-                <Typography sx={{ fontWeight: "bold", fontSize: "1.6em", textAlign: "center" }} >{id} </Typography>
-            </Box>
+        <Box sx={pageContainer}>
             <Box>
-                {user && <PerformanceSummaryForAdminPerProject timePeriod={timePeriod} startDate={startDateFilter} endDate={endDateFilter} organisation={user.organisationid} project={id} />
+                <PageHeader message={id}/>
+            </Box>
+            <Box sx={{marginTop:"3vh"}}>
+                {user && <PerformanceSummaryForAdminPerProjectTag timePeriod={timePeriod} startDate={startDateFilter} endDate={endDateFilter}  organisation={user.organisationid} tag={id} />
             }
             </Box>
         </Box>

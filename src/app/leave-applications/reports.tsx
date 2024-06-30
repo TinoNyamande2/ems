@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-import LeaveTable, { LeaveTableDetails, LeaveTableReport, LeaveTableReportGrouped} from "./tabledata"
+import LeaveTable, { LeaveTableDetails, LeaveTableReport, LeaveTableReportGrouped } from "./tabledata"
 import { QueryResultRow } from "@vercel/postgres"
 import { getApplicationByUsername, getFilteredApplicationsForAdmin } from "@/data/leaveapplications";
 import { useSession } from "next-auth/react";
@@ -20,15 +20,15 @@ export default function LeaveReports() {
     const searchParams = useSearchParams();
     const user = searchParams.get("user") || "";
     const leavetype = searchParams.get("leavetype") || "";
-    const groupBy = searchParams.get('groupBy')||''
+    const groupBy = searchParams.get('groupBy') || ''
     const [openSearch, setOpenSearch] = useState(false)
     const [applications, setApplications] = useState<QueryResultRow[] | undefined>(undefined)
-    const { data, isLoading, isError, error } = useQuery(["leave-admin-report", organisationid, user, leavetype,groupBy], () => getFilteredApplicationsForAdmin(user, leavetype, organisationid,groupBy))
+    const { data, isLoading, isError, error } = useQuery(["leave-admin-report", organisationid, user, leavetype, groupBy], () => getFilteredApplicationsForAdmin(user, leavetype, organisationid, groupBy))
     useEffect(() => {
         if (!isLoading) {
             setApplications(data)
         }
-    }, [searchParams, leavetype, user, data, isLoading,groupBy,error,isError])
+    }, [searchParams, leavetype, user, data, isLoading, groupBy, error, isError])
 
     if (isLoading) {
         return (
@@ -53,7 +53,8 @@ export default function LeaveReports() {
                     sx={{ marginBottom: 2, marginTop: 1 }}
                 >
                     {openSearch ? "Close Search Bar" : "Open Search Bar"}
-                </Button>            </Box>
+                </Button>
+            </Box>
             {!groupBy && applications && <LeaveTableReport applications={applications} />}
             {groupBy && applications && <LeaveTableReportGrouped groupBy={groupBy} applications={applications} />}
 

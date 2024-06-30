@@ -1,20 +1,18 @@
+"use client"
 import { getAllPerformanceFromPeriod } from "@/data/perfomance";
-import { Autocomplete, Box, Divider, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Divider, TextField, Typography } from "@mui/material";
 import { QueryResultRow } from "@vercel/postgres";
 import { subWeeks } from "date-fns";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useQuery } from "react-query";
-import { PerformancePieChart } from "./performancePieChart";
-import { PerformanceByHourtable } from "./OverviewTable";
 import { validateHeaderValue } from "http";
-import Search from "./search";
 import { useRouter, useSearchParams } from "next/navigation";
 import { format } from "date-fns"
-import { UserSummarySearch } from "./userSummarySearch";
-import { PerformanceSummaryForAdminProjects } from "../../../components/performancetracker/admin/adminSummaryTables";
-import { AdminSummarySearch } from "./adminSummarySearch";
+import { PerformanceSummaryForAdminProjects } from "../../../../../components/performancetracker/admin/adminSummaryTables";
+import { AdminSummarySearch } from "../../adminSummarySearch";
+import { useUserContext } from "@/context/userContext";
 
-export default function Overview({ organisation }: { organisation: string | null | undefined }) {
+export default function Overview() {
 
     const [enddate, setEnddate] = useState(new Date());
     const defaultStartdate = subWeeks(enddate, 4);
@@ -24,18 +22,30 @@ export default function Overview({ organisation }: { organisation: string | null
     const groupBy = searchParams.get("groupBy") || "";
     const startDateFilter = searchParams.get("startDate") || "";
     const endDateFilter = searchParams.get("endDate") || "";
+    const [openSearch, setOpenSearch] = useState(false)
     const timePeriod = searchParams.get("timePeriod") || "";
+    const { organisationid } = useUserContext();
     useEffect(() => {
     }, [searchParams, startDateFilter, endDateFilter, timePeriod, groupBy])
     return (
         <Box>
 
-            <Box sx={{ marginTop: "5vh", marginBotton: "5vh" }} >
-                <AdminSummarySearch placeholder="" />
+            <Box>
+                {openSearch && <AdminSummarySearch placeholder="" />}
+                <Button
+                    onClick={() => setOpenSearch((prev) => !prev)}
+                    size="small"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    sx={{ marginBottom: 2, marginTop: 1 }}
+                >
+                    {openSearch ? "Close Search Bar" : "Open Search Bar"}
+                </Button>
             </Box>
             <hr />
             <Box sx={{ marginTop: "5vh", marginBotton: "5vh", marginLeft: "auto", marginRight: "auto", width: "80%" }} >
-                <PerformanceSummaryForAdminProjects organisation={organisation} timePeriod={timePeriod} startDate={startDateFilter} endDate={endDateFilter} groupBy={groupBy} />
+                <PerformanceSummaryForAdminProjects organisation={organisationid} timePeriod={timePeriod} startDate={startDateFilter} endDate={endDateFilter} groupBy={groupBy} />
             </Box>
         </Box>
     );

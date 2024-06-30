@@ -1,11 +1,12 @@
 import { getFilteredPerformanceSummaryForUser, getPerformanceSummaryForUser, getPerformanceSummaryForUserPerProject, getPerformanceSummaryForUserPerProjecttag } from "@/data/perfomance";
-import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import { QueryResultRow } from "@vercel/postgres";
 import { useEffect, useState } from "react";
 import { CircularProgressSpinner } from "../../../components/misc/CircularProgress";
 import { useQuery } from "react-query";
 import { CustomPieChart } from "../../../components/charts/PieChart"
 import { useRouter } from "next/navigation";
+import { tableCell, tableContainer, tableHead } from "../../styyle";
 
 interface ProjectGraph {
     id: string,
@@ -13,7 +14,7 @@ interface ProjectGraph {
     value: number,
 }
 
-export const PerformanceSummaryForUserProjects = ({ groupBy, organisation, username, timePeriod, startDate, endDate }: { groupBy: string, organisation: string | null | undefined, username: string | null | undefined, timePeriod: string, startDate: string, endDate: string }) => {
+export const PerformanceSummaryForUserProjects = ({ name, groupBy, organisation, username, timePeriod, startDate, endDate }: { name: string, groupBy: string, organisation: string | null | undefined, username: string | null | undefined, timePeriod: string, startDate: string, endDate: string }) => {
     const [projectData, setProjectData] = useState<QueryResultRow[] | undefined>(undefined)
     const { data, error, isError, isLoading } = useQuery([timePeriod, startDate, endDate, groupBy, username, organisation, "user performance data"], () => getFilteredPerformanceSummaryForUser(username, organisation, groupBy, timePeriod, startDate, endDate));
     const [performanceData, setPerformanceData] = useState<ProjectGraph[]>([])
@@ -54,16 +55,16 @@ export const PerformanceSummaryForUserProjects = ({ groupBy, organisation, usern
         )
     }
 
-    
+
 
     const handleRedirect = (id: string) => {
         let url
-      
+
 
         if (groupBy.trim() == "Project Tags") {
-            url = `/performance-tracker/userSummary/tags/${id}?timePeriod=${encodeURIComponent(timePeriod)}&?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+            url = `/performance-tracker/${name}/summary/userSummary/tags/${id}?timePeriod=${encodeURIComponent(timePeriod)}&?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
         } else {
-            url = `/performance-tracker/userSummary/projects/${id}?timePeriod=${encodeURIComponent(timePeriod)}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+            url = `/performance-tracker/${name}/summary/userSummary/projects/${id}?timePeriod=${encodeURIComponent(timePeriod)}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
         }
         router.push(url);
     };
@@ -72,30 +73,50 @@ export const PerformanceSummaryForUserProjects = ({ groupBy, organisation, usern
 
     return (
         <>
-            <Box>
+            <Box sx={{ maxWidth: "80%" }}>
                 {performanceData.length > 0 && <CustomPieChart data={performanceData} />}
             </Box>
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} sx={tableContainer}>
                 <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell></TableCell>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }} >Total Hours</TableCell>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>Percentage</TableCell>
+                            <TableCell sx={tableHead}>
+                                Total Hours
+                            </TableCell>
+                            <TableCell sx={tableHead}>
+                                Percentage
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {projectData?.map((row, index) => (
                             <TableRow key={index}>
-                                <TableCell><button onClick={() => handleRedirect(`${row.label}`)}>{row.label} </button></TableCell>
-                                <TableCell>{row.value}</TableCell>
-                                <TableCell>{((row.value / totalHours) * 100).toFixed(2)}%</TableCell>
+                                <TableCell
+                                    sx={tableCell}
+                                >
+                                    <Button size="small" onClick={() => handleRedirect(`${row.label}`)}>
+                                        {row.label}
+                                    </Button>
+                                </TableCell>
+                                <TableCell sx={tableCell}>
+                                    {row.value.toFixed(2)}
+                                </TableCell>
+                                <TableCell sx={tableCell}>
+                                    {((row.value / totalHours) * 100).toFixed(2)}%
+                                </TableCell>
                             </TableRow>
                         ))}
                         <TableRow>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>Total</TableCell>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>{totalHours}</TableCell>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>100%</TableCell>
+                            <TableCell sx={tableHead}>
+                                Total
+                            </TableCell>
+                            <TableCell sx={tableHead}>
+                                {totalHours.toFixed(2)}
+                            </TableCell>
+                            <TableCell sx={tableHead}>
+                                100%
+                            </TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -104,9 +125,9 @@ export const PerformanceSummaryForUserProjects = ({ groupBy, organisation, usern
     )
 }
 
-export const PerformanceSummaryForUserPerProject = ({ project, organisation, username ,timePeriod,startDate,endDate}: { project: string, organisation: string | null | undefined, username: string | null | undefined,timePeriod:string,startDate:string,endDate:string }) => {
+export const PerformanceSummaryForUserPerProject = ({ project, organisation, username, timePeriod, startDate, endDate }: { project: string, organisation: string | null | undefined, username: string | null | undefined, timePeriod: string, startDate: string, endDate: string }) => {
     const [projectData, setProjectData] = useState<QueryResultRow[] | undefined>(undefined)
-    const { data, error, isError, isLoading } = useQuery([timePeriod,startDate,endDate,username, organisation, project, "user performance data per project"], () => getPerformanceSummaryForUserPerProject(username, organisation, project,timePeriod,startDate,endDate));
+    const { data, error, isError, isLoading } = useQuery([timePeriod, startDate, endDate, username, organisation, project, "user performance data per project"], () => getPerformanceSummaryForUserPerProject(username, organisation, project, timePeriod, startDate, endDate));
     const [performanceData, setPerformanceData] = useState<ProjectGraph[]>([])
     const [returnedData, setReturnedData] = useState<QueryResultRow[] | undefined>(undefined)
 
@@ -155,22 +176,22 @@ export const PerformanceSummaryForUserPerProject = ({ project, organisation, use
                     <TableHead>
                         <TableRow>
                             <TableCell></TableCell>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>Total Hours</TableCell>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>Percentage</TableCell>
+                            <TableCell sx={tableHead}>Total Hours</TableCell>
+                            <TableCell sx={tableHead}>%</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {projectData?.map((row, index) => (
                             <TableRow key={index}>
-                                <TableCell>{row.label}</TableCell>
-                                <TableCell>{row.value}</TableCell>
-                                <TableCell>{((row.value / totalHours) * 100).toFixed(2)}%</TableCell>
+                                <TableCell sx={tableCell}>{row.label}</TableCell>
+                                <TableCell sx={tableCell}>{row.value}</TableCell>
+                                <TableCell sx={tableCell}>{((row.value / totalHours) * 100).toFixed(2)}%</TableCell>
                             </TableRow>
                         ))}
                         <TableRow>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>Total</TableCell>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>{totalHours}</TableCell>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>100%</TableCell>
+                            <TableCell sx={tableHead}>Total</TableCell>
+                            <TableCell sx={tableCell}>{totalHours}</TableCell>
+                            <TableCell sx={tableCell}>100%</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -179,9 +200,9 @@ export const PerformanceSummaryForUserPerProject = ({ project, organisation, use
     )
 }
 
-export const PerformanceSummaryForUserPerProjectTag = ({ tag, organisation, username,timePeriod,startDate,endDate }: { tag: string, organisation: string | null | undefined, username: string | null | undefined,timePeriod:string,startDate:string,endDate:string }) => {
+export const PerformanceSummaryForUserPerProjectTag = ({ tag, organisation, username, timePeriod, startDate, endDate }: { tag: string, organisation: string | null | undefined, username: string | null | undefined, timePeriod: string, startDate: string, endDate: string }) => {
     const [projectData, setProjectData] = useState<QueryResultRow[] | undefined>(undefined)
-    const { data, error, isError, isLoading } = useQuery([startDate,endDate,timePeriod,username, organisation, tag, "user performance data per project tag"], () => getPerformanceSummaryForUserPerProjecttag(username, organisation, tag,timePeriod,startDate,endDate));
+    const { data, error, isError, isLoading } = useQuery([startDate, endDate, timePeriod, username, organisation, tag, "user performance data per project tag"], () => getPerformanceSummaryForUserPerProjecttag(username, organisation, tag, timePeriod, startDate, endDate));
     const [performanceData, setPerformanceData] = useState<ProjectGraph[]>([])
     const [returnedData, setReturnedData] = useState<QueryResultRow[] | undefined>(undefined)
 
@@ -230,22 +251,22 @@ export const PerformanceSummaryForUserPerProjectTag = ({ tag, organisation, user
                     <TableHead>
                         <TableRow>
                             <TableCell></TableCell>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>Total Hours</TableCell>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>Percentage</TableCell>
+                            <TableCell sx={tableHead}>Total Hours</TableCell>
+                            <TableCell sx={tableHead} >Percentage</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {projectData?.map((row, index) => (
                             <TableRow key={index}>
-                                <TableCell>{row.label}</TableCell>
-                                <TableCell>{row.value}</TableCell>
-                                <TableCell>{((row.value / totalHours) * 100).toFixed(2)}%</TableCell>
+                                <TableCell sx={tableCell} >{row.label}</TableCell>
+                                <TableCell sx={tableCell} >{row.value}</TableCell>
+                                <TableCell sx={tableCell} >{((row.value / totalHours) * 100).toFixed(2)}%</TableCell>
                             </TableRow>
                         ))}
                         <TableRow>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>Total</TableCell>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>{totalHours}</TableCell>
-                            <TableCell sx={{ fontSize: "1.3em", fontWeight: "bold" }}>100%</TableCell>
+                            <TableCell sx={tableHead} >Total</TableCell>
+                            <TableCell sx={tableHead} >{totalHours}</TableCell>
+                            <TableCell sx={tableHead} >100%</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>

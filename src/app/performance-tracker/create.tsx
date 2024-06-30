@@ -2,7 +2,7 @@
 import "./../globals.css"
 import { Dayjs } from 'dayjs';
 import AddWorkItemModal from "../../../components/performancetracker/workitemmodal";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, differenceInMinutes, addWeeks, subWeeks } from 'date-fns';
 import { Button, Container, Typography, Box } from '@mui/material';
 import { addPerformance } from "@/data/perfomance";
@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import { WorkItemsPerDay } from "../../../components/performancetracker/workItemsPerDay";
 import { CircularProgressSpinner } from "../../../components/misc/CircularProgress";
 import { ToastNotificationSuccess, ToastNotificationError } from "../../../components/misc/ToastNotification";
+import { useUserContext } from "@/context/userContext";
 
 interface WorkItem {
   day: Date;
@@ -22,7 +23,7 @@ interface WorkItem {
   summary: string;
 }
 
-const WorkItems = ({ organisation, username }: { organisation: string | undefined, username: string | undefined }) => {
+const WorkItems = () => {
   const [workItems, setWorkItems] = useState<WorkItem[]>([]);
   const [currentWeek, setCurrentWeek] = useState<Date>(new Date());
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
@@ -33,6 +34,7 @@ const WorkItems = ({ organisation, username }: { organisation: string | undefine
   const [successToastOpen, setSuccessToastOpen] = useState(false)
   const [successToastMessage, setSuccessToastMessage] = useState("")
   const [isSaving, setIsSaving] = useState(false)
+  const {organisationid,username} = useUserContext()
 
   const startOfWeekDate = startOfWeek(currentWeek, { weekStartsOn: 1 });
   const endOfWeekDate = endOfWeek(currentWeek, { weekStartsOn: 1 });
@@ -54,7 +56,7 @@ const WorkItems = ({ organisation, username }: { organisation: string | undefine
         tags: tags,
         summary: summary,
         username: username,
-        organisation: organisation
+        organisation: organisationid
       }
       setIsSaving(true)
       try {
@@ -84,12 +86,14 @@ const WorkItems = ({ organisation, username }: { organisation: string | undefine
     setSuccessToastOpen(false);
     setErrorToastOpen(false)
   }
+  useEffect(()=>{
+    console.log("Create page")
+  },[])
 
   return (
     <Container>
       {isSaving ? (<CircularProgressSpinner message="Saving" />) : (
         <>
-          <Typography variant="h4" component="h1" gutterBottom>Employee Work Items</Typography>
           <ToastNotificationSuccess message={successToastMessage} isOpen={successToastOpen} handleClick={handleToastClick} duration={4000} />
           <ToastNotificationError message={errorToastMessage} isOpen={errorToastOpen} handleClick={handleToastClick} duration={4000} />
           <div>
@@ -99,12 +103,12 @@ const WorkItems = ({ organisation, username }: { organisation: string | undefine
           <div>
             {daysOfWeek.map((day) => (
               <div key={day.toISOString()} className='day'>
-                <Typography variant="h6" component="h2">{format(day, 'EEEE, MMM d, yyyy')}</Typography>
+                <Typography sx={{fontWeight:"bold"}} variant="h6" component="h2">{format(day, 'EEEE, MMM d, yyyy')}</Typography>
                 <Button variant="contained" onClick={() => { setSelectedDay(day); setModalIsOpen(true); }}>
                   Add Item
                 </Button>
                 <Box>
-                  <WorkItemsPerDay username={username} date={day.toDateString()} refetchTrigger={refetchTrigger} organisation={organisation} />
+                  <WorkItemsPerDay username={username} date={day.toDateString()} refetchTrigger={refetchTrigger} organisation={organisationid} />
                 </Box>
               </div>
             ))}
@@ -114,7 +118,7 @@ const WorkItems = ({ organisation, username }: { organisation: string | undefine
               isOpen={modalIsOpen}
               onRequestClose={() => setModalIsOpen(false)}
               onAddItem={handleAddItem}
-              organisation={organisation}
+              organisation={organisationid}
             />
           )}
         </>

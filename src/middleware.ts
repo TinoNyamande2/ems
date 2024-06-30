@@ -28,7 +28,11 @@ export async function middleware(req: NextRequest) {
   const isAdminRoute = [
     /^\/leave-applications\/[^\/]+\/approve$/,
     /^\/leave-applications\/[^\/]+\/approve\/[^\/]+$/,
-    /^\/leave-applications\/[^\/]+\/reports$/
+    /^\/leave-applications\/[^\/]+\/reports$/,
+    /^\/performance-tracker\/[^\/]+\/overview\/$/,
+    /^\/performance-tracker\/[^\/]+\/overview\/summary\/project\/[^\/]+$/,
+    /^\/performance-tracker\/[^\/]+\/overview\/summary\/user\/[^\/]+$/,
+    /^\/performance-tracker\/[^\/]+\/overview\/summary\/projecttags\/[^\/]+$/
   ].some((regex) => regex.test(pathname));
 
   if (token.role !== 'admin' && isAdminRoute) {

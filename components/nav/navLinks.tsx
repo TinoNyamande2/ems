@@ -9,7 +9,6 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import FlightIcon from '@mui/icons-material/Flight';
-import CreateIcon from '@mui/icons-material/Create';
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
@@ -17,12 +16,9 @@ import ApprovalIcon from '@mui/icons-material/Approval';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useRouter } from 'next/navigation';
-import { getUserByEmail } from "@/data/user";
-import { useQuery } from "react-query";
-import { useEffect, useState } from "react";
-import { QueryResultRow } from "@vercel/postgres";
 
 export const NavLinks = () => {
     const { data: session } = useSession();
@@ -46,29 +42,32 @@ export const NavLinks = () => {
                         <ListItemText primary={<Typography style={{ fontWeight: 'bold' }}>Dashboard</Typography>} />
                     </ListItemButton>
                     <Divider sx={{ my: 1 }} />
-                    <ListItemButton onClick={() => handleRedirect(`/leave-applications/${session?.user?.name}`)}>
+                    <ListSubheader component="div" inset>
+                        <Typography sx={{ fontWeight: "bold" }}>Performance Tracker</Typography>
+                    </ListSubheader>
+                    <ListItemButton onClick={() => handleRedirect(`/performance-tracker/${session?.user?.name}`)}>
                         <ListItemIcon>
-                            <FlightIcon />
+                        <WorkHistoryIcon />
                         </ListItemIcon>
-                        <ListItemText primary="Leave Applications" />
+                        <ListItemText primary="Tracker" />
                     </ListItemButton>
-                    <ListItemButton onClick={() => handleRedirect("/performance-tracker")}>
+                    <ListItemButton onClick={() => handleRedirect(`/performance-tracker/${session?.user?.name}/summary`)} >
                         <ListItemIcon>
-                            <WorkHistoryIcon />
+                            <SummarizeIcon/>
                         </ListItemIcon>
-                        <ListItemText primary="Performance Tracker" />
+                        <ListItemText primary="Summary" />
                     </ListItemButton>
                     {session.user?.role === "admin" && (
-                        <ListItemButton onClick={() => handleRedirect("/settings")}>
+                        <ListItemButton onClick={() => handleRedirect(`/performance-tracker/${session?.user?.name}/overview`)}>
                             <ListItemIcon>
                                 <BarChartIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Settings" />
+                            <ListItemText primary="Overview" />
                         </ListItemButton>
                     )}
                     <Divider sx={{ my: 1 }} />
                     <ListSubheader component="div" inset>
-                        <Typography sx={{ fontWeight: "bold", fontSize: "1.3em" }}>Leave Applications</Typography>
+                        <Typography sx={{ fontWeight: "bold" }}>Leave Applications</Typography>
                     </ListSubheader>
                     <ListItemButton onClick={() => handleRedirect(`leave-applications/${session?.user?.name}`)}>
                         <ListItemIcon>

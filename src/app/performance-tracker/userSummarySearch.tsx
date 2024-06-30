@@ -128,15 +128,15 @@ export const UserSummarySearch = ({ placeholder }: { placeholder: string }) => {
     params.delete('startDate');
     params.delete('endDate');
     replace(`${pathname}?${params.toString()}`);
-    setGroupBy("Project");
-    setTimePeriod("");
-    setStartDate("");
-    setEndDate("");
+    // setGroupBy("Project");
+    // setTimePeriod("");
+    // setStartDate("");
+    // setEndDate("");
   };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "space-around", width: "100%" }}>
-      <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-around", width: "100%" }}>
+      <Box sx={{ display: "flex", flexDirection: {sm:"row",xs:"column"}, justifyContent: "space-around", width: "100%" }}>
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%", marginRight: 2 }}>
           <label htmlFor="group-by">Group By</label>
           <Autocomplete

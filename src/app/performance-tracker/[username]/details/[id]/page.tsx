@@ -3,13 +3,12 @@ import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Box, Typography, TextField, Button, Select, MenuItem, FormControl } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { CircularProgressSpinner } from '../../../../components/misc/CircularProgress';
-import { ToastNotificationError, ToastNotificationSuccess, ToastNotificationWarning } from '../../../../components/misc/ToastNotification';
-import { ErrorOccured } from '../../../../components/misc/ErrorOccured';
+import { CircularProgressSpinner } from '../../../../../../components/misc/CircularProgress';
+import { ToastNotificationError, ToastNotificationSuccess, ToastNotificationWarning } from '../../../../../../components/misc/ToastNotification';
+import { ErrorOccured } from '../../../../../../components/misc/ErrorOccured';
 import Link from 'next/link';
 import { getAllProjects } from '@/data/projects';
 import { getAllTags } from '@/data/tags';
-import "./../../globals.css"
 import { Dayjs } from 'dayjs';
 import { useSession } from "next-auth/react";
 import { QueryResultRow } from '@vercel/postgres';
@@ -23,6 +22,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimeField } from '@mui/x-date-pickers/TimeField';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { getUserByEmail } from '@/data/user';
+import { useUserContext } from '@/context/userContext';
+import { pageContainer } from '../../../../../../components/styyle';
+import { PageHeader } from '../../../../../../components/nav/pageHeader';
 
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -40,11 +42,8 @@ export default function Page({ params }: { params: { id: string } }) {
     const [startTimeEdit, setStartTimeEdit] = useState<Dayjs | null>(null);
     const [endTimeEdit, setEndTimeEdit] = useState<Dayjs | null>(null);
     const router = useRouter();
-    const [user, setUser] = useState<QueryResultRow | undefined>(undefined);
-
+    const { name, username, organisationid } = useUserContext();
     const { data, isLoading, isError, error } = useQuery(['performance', id], () => getPerformanceById(id));
-    const { data: session } = useSession();
-    const useremail = session?.user?.email;
 
     useEffect(() => {
         if (!isLoading && data) {
@@ -53,32 +52,21 @@ export default function Page({ params }: { params: { id: string } }) {
             setEndTime(data.endtime)
         }
     }, [data, isLoading]);
-    useEffect(() => {
-        const fetchUser = async () => {
-            const userData = await getUserByEmail(useremail);
-            if (userData) {
-                console.log("UserData", userData)
-                setUser(userData)
-            }
-        }
-        fetchUser();
-    }, [useremail]);
+
     useEffect(() => {
 
         const fetchProject = async () => {
-            const data = await getAllProjects(user?.organisationid);
-            console.log("Projects", data)
-            setProjectsList(await data);
+            const data = await getAllProjects(organisationid);
+            setProjectsList(data);
         }
         const fetchTags = async () => {
-            const data = await getAllTags(user?.organisationid);
-            console.log("Tags", data)
-            setTagsList(await data);
+            const data = await getAllTags(organisationid);
+            setTagsList(data);
         }
 
         fetchProject();
         fetchTags();
-    }, [user]);
+    }, [organisationid]);
 
     const handleClick = () => {
         setOpen(false);
@@ -92,10 +80,9 @@ export default function Page({ params }: { params: { id: string } }) {
             await deletePerformance(id);
             setWarningToastOpen(true);
             setTimeout(() => {
-                router.push("/performance-tracker");
+                router.push(`/performance-tracker/${name}`);
             }, 3000);
         } catch (error) {
-            console.error('Error deleting application:', error);
             setErrorSavingData((error as Error).message);
             setErrorToastOpen(true);
         } finally {
@@ -128,7 +115,7 @@ export default function Page({ params }: { params: { id: string } }) {
             console.log(editMyPerformance)
             setOpen(true);
             setTimeout(() => {
-                router.push("/performance-tracker");
+                router.push(`/performance-tracker/${name}`);
             }, 3000);
         } catch (error) {
             setErrorSavingData((error as Error).message);
@@ -166,86 +153,88 @@ export default function Page({ params }: { params: { id: string } }) {
     }
 
     return (
-        <div className="max-w-md mx-auto mt-8">
-            {isSaving ? (<CircularProgressSpinner message='Saving'/>) : (
+        <Box sx={pageContainer}>
+            <PageHeader message='Update Entry' />
+            {isSaving ? (<CircularProgressSpinner message='Saving' />) : (
                 <>
                     <ToastNotificationSuccess message="Entry Updated Successfully" isOpen={open} handleClick={handleClick} duration={6000} />
                     <ToastNotificationWarning message="Entry Deleted Successfully" isOpen={warningToastOpen} handleClick={handleClick} duration={6000} />
                     <ToastNotificationError message={errorSavingData} isOpen={errorToastOpen} handleClick={handleClick} duration={6000} />
-                    <Box sx={{ marginTop: "3vh" }}>
-                        <Typography sx={{ fontWeight: "bold", fontSize: "1.6em", textAlign: "center" }} >Update Entry</Typography>
-                    </Box>            {isSaving && <div className="absolute inset-0 flex justify-center items-center bg-opacity-50 bg-gray-500 z-50">
+
+                    {isSaving && <div className="absolute inset-0 flex justify-center items-center bg-opacity-50 bg-gray-500 z-50">
                         <CircularProgressSpinner message='Saving' />
                     </div>}
 
                     {performance && <Box sx={{
 
                     }}>
-                        <form onSubmit={(e) => e.preventDefault()}>
-                            <Typography id="project-label">Project : {performance.projectname}</Typography>
-                            <FormControl fullWidth margin="normal">
-                                <Select
-                                    labelId="project-label"
-                                    value={performance.project}
-                                    onChange={(e) => setPerformance((prevInputs) => ({ ...prevInputs, ['project']: e.target.value as string }))}
-                                >
-                                    {projectsList.map((project) => (
-                                        <MenuItem key={project.id} value={project.id}>
-                                            {project.projectname}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            <FormControl fullWidth margin="normal">
-                                <Typography>Tag :{performance.tagname}</Typography>
-                                <Select
-                                    labelId="tag-label"
-                                    value={performance.tags}
-                                    onChange={(e) => setPerformance((prevInputs) => ({ ...prevInputs, ['tags']: e.target.value as string }))}>
-                                    {tagsList.map((tag) => (
-                                        <MenuItem key={tag.id} value={tag.id}>
-                                            {tag.tagname}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            <Typography>Summary : {performance.summary}</Typography>
-                            <TextField
-                                fullWidth
-                                name="summary"
-                                margin="normal"
-                                onChange={handleChange}
-                            />
-                            <Typography>Start Time: {format(new Date(startTime), "HH:mm a")} </Typography>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DemoContainer components={['TimeField']}>
-                                    <TimeField
-                                        fullWidth
-                                        value={startTimeEdit}
-                                        onChange={(newValue) => setStartTimeEdit(newValue)}
-                                    />
-                                </DemoContainer>
-                            </LocalizationProvider>
-                            <Typography>End Time{format(new Date(endTime), "HH:mm a")} </Typography>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DemoContainer components={['TimeField']}>
-                                    <TimeField
-                                        fullWidth
-                                        value={endTimeEdit}
-                                        onChange={(newValue) => setEndTimeEdit(newValue)}
-                                    />
-                                </DemoContainer>
-                            </LocalizationProvider>
-                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-                                <Button onClick={onUpdate} sx={{ backgroundColor: "blue", color: "white" }} fullWidth>Update</Button>
-                                <Button onClick={onDelete} sx={{ backgroundColor: "red", color: "white" }} fullWidth>Delete</Button>
-                                <Button sx={{ backgroundColor: "orange", color: "white" }} fullWidth><Link href="/performance-tracker">Cancel</Link></Button>
-                            </Box>
-                        </form>
+                        <Box sx={{ marginTop: "3vh" }}>
+                            <form onSubmit={(e) => e.preventDefault()}>
+                                <Typography id="project-label">Project : {performance.projectname}</Typography>
+                                <FormControl fullWidth margin="normal">
+                                    <Select
+                                        labelId="project-label"
+                                        value={performance.project}
+                                        onChange={(e) => setPerformance((prevInputs) => ({ ...prevInputs, ['project']: e.target.value as string }))}
+                                    >
+                                        {projectsList.map((project) => (
+                                            <MenuItem key={project.id} value={project.id}>
+                                                {project.projectname}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                <FormControl fullWidth margin="normal">
+                                    <Typography>Tag :{performance.tagname}</Typography>
+                                    <Select
+                                        labelId="tag-label"
+                                        value={performance.tags}
+                                        onChange={(e) => setPerformance((prevInputs) => ({ ...prevInputs, ['tags']: e.target.value as string }))}>
+                                        {tagsList.map((tag) => (
+                                            <MenuItem key={tag.id} value={tag.id}>
+                                                {tag.tagname}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                <Typography>Summary : {performance.summary}</Typography>
+                                <TextField
+                                    fullWidth
+                                    name="summary"
+                                    margin="normal"
+                                    onChange={handleChange}
+                                />
+                                <Typography>Start Time: {format(new Date(startTime), "HH:mm a")} </Typography>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DemoContainer components={['TimeField']}>
+                                        <TimeField
+                                            fullWidth
+                                            value={startTimeEdit}
+                                            onChange={(newValue) => setStartTimeEdit(newValue)}
+                                        />
+                                    </DemoContainer>
+                                </LocalizationProvider>
+                                <Typography>End Time{format(new Date(endTime), "HH:mm a")} </Typography>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DemoContainer components={['TimeField']}>
+                                        <TimeField
+                                            fullWidth
+                                            value={endTimeEdit}
+                                            onChange={(newValue) => setEndTimeEdit(newValue)}
+                                        />
+                                    </DemoContainer>
+                                </LocalizationProvider>
+                                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                                    <Button onClick={onUpdate} sx={{ backgroundColor: "blue", color: "white" }} fullWidth>Update</Button>
+                                    <Button onClick={onDelete} sx={{ backgroundColor: "red", color: "white" }} fullWidth>Delete</Button>
+                                    <Button sx={{ backgroundColor: "orange", color: "white" }} fullWidth><Link style={{textDecoration:"none"}} href={`/performance-tracker/${name}`}>Cancel</Link></Button>
+                                </Box>
+                            </form>
+                        </Box>
                     </Box>}
                 </>
             )}
 
-        </div>
+        </Box>
     );
 };

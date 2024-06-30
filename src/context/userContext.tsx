@@ -10,12 +10,12 @@ interface UserContextProps {
     name: string;
     role: string;
     organisation: string;
-    organisationid:string,
+    organisationid: string;
     setUsername: (username: string) => void;
     setName: (name: string) => void;
     setOrganisation: (organisation: string) => void;
     setRole: (role: string) => void;
-    setOrganisationId :(organisationid:string)=>void;
+    setOrganisationId: (organisationid: string) => void;
 }
 
 const userContextPropsDefaultValues: UserContextProps = {
@@ -23,12 +23,12 @@ const userContextPropsDefaultValues: UserContextProps = {
     name: "",
     role: "",
     organisation: "",
-    organisationid:"",
+    organisationid: "",
     setUsername: () => { },
     setName: () => { },
     setOrganisation: () => { },
     setRole: () => { },
-    setOrganisationId :()=>{}
+    setOrganisationId: () => { }
 };
 
 const UserContext = createContext<UserContextProps>(userContextPropsDefaultValues);
@@ -42,7 +42,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const [name, setName] = useState<string>(userContextPropsDefaultValues.name);
     const [role, setRole] = useState<string>(userContextPropsDefaultValues.role);
     const [organisation, setOrganisation] = useState<string>(userContextPropsDefaultValues.organisation);
-    const [user, setUser] = useState<QueryResultRow | undefined>(undefined);
     const [organisationid, setOrganisationId] = useState<string>(userContextPropsDefaultValues.organisationid);
 
     const { data: session } = useSession();
@@ -54,7 +53,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         }
     };
 
-    const { data, isLoading } = useQuery(['user', useremail], fetchUser, {
+    const { data, isLoading, error } = useQuery(['user', useremail], fetchUser, {
         enabled: !!useremail,
     });
 
@@ -64,12 +63,16 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             setName(data?.username || "");
             setRole(data?.role || "");
             setOrganisation(data?.organisationname || "");
-            setOrganisationId(data?.organisationid||"")
+            setOrganisationId(data?.organisationid || "")
         }
     }, [data, isLoading]);
 
+    if (error) {
+        console.error("Error fetching user data:", error);
+    }
+
     return (
-        <UserContext.Provider value={{ username, name, role, organisation,organisationid, setUsername, setName, setOrganisation, setRole,setOrganisationId }}>
+        <UserContext.Provider value={{ username, name, role, organisation, organisationid, setUsername, setName, setOrganisation, setRole, setOrganisationId }}>
             {children}
         </UserContext.Provider>
     );
