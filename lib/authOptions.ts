@@ -61,7 +61,8 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
-        token.role = user.role; // Include the role in the token
+        token.role = user.role;
+        token.organisationid = user.organisationid
       } else if (token.email) {
         // Fetch the role from the database if the token already exists but the role is not set
         const data = await sql`SELECT role FROM users WHERE email=${token.email} LIMIT 1`;
@@ -78,6 +79,7 @@ export const authOptions: NextAuthOptions = {
           name: token.name,
           email: token.email,
           role: token.role,
+          organisationid:token.organisationid
         };
       }
       return session;
@@ -89,8 +91,10 @@ export const authOptions: NextAuthOptions = {
           await sql`INSERT INTO users (name, email, role) VALUES (${user.name}, ${user.email}, 'admin')`;
         } else {
           user.role = data.rows[0].role;
+          user.organisationid = data.rows[0].organisation
         }
       }
+      
       return true;
     },
   },

@@ -3,7 +3,6 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
   const { pathname } = req.nextUrl;
 
   // Allow requests if the following is true:
@@ -23,6 +22,9 @@ export async function middleware(req: NextRequest) {
     // Redirect to login if no token and requesting a protected route
     return NextResponse.redirect(new URL('/login', req.nextUrl.origin));
   }
+  if(!token.organisationid && pathname !== '/' && pathname!== '/profile' && pathname !=='/create-company') {
+    return NextResponse.redirect(new URL('/',req.nextUrl.origin));
+  }
 
   // Block specific routes for non-admin users
   const isAdminRoute = [
@@ -35,10 +37,10 @@ export async function middleware(req: NextRequest) {
     /^\/performance-tracker\/[^\/]+\/overview\/summary\/projecttags\/[^\/]+$/
   ].some((regex) => regex.test(pathname));
 
-  if (token.role !== 'admin' && isAdminRoute) {
-    // Redirect to unauthorized page if user is not an admin and trying to access a protected dynamic route
+  if (token.role !== 'admin' && isAdminRoute && token.organisationid) {
     return NextResponse.redirect(new URL('/unauthorized', req.nextUrl.origin));
   }
+
 
   return NextResponse.next();
 }

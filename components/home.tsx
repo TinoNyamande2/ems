@@ -24,6 +24,9 @@ import { ErrorOccured } from "./misc/ErrorOccured";
 import { ToastNotificationError, ToastNotificationSuccess } from "./misc/ToastNotification";
 import { useState } from "react";
 import { useUserContext } from "@/context/userContext";
+import { pageContainer } from "./styyle";
+import { PageHeader } from "./nav/pageHeader";
+import Link from "next/link";
 
 
 export default function Home() {
@@ -37,8 +40,40 @@ export default function Home() {
   const [successToastOpen, setSuccessToastOpen] = useState(false);
   const [successToastMessage, setSuccessToastMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const { username, name, role, organisation, setName, setOrganisation, setRole, setUsername, setOrganisationId } = useUserContext();
+  const { username, name, role, organisation,organisationid, setName, setOrganisation, setRole, setUsername, setOrganisationId } = useUserContext();
 
+
+
+
+  const fetchUser = () => getUserByEmail(useremail);
+
+  const { data, isError, isLoading, error,refetch } = useQuery(
+    [useremail],
+    fetchUser,
+    {
+      enabled: !!useremail,
+    }
+  );
+
+  useEffect(() => {
+    if (!isLoading) {
+      setUser(data)
+      setUsername(data?.useremail || "");
+      setName(data?.username || "");
+      setRole(data?.role || "");
+      setOrganisation(data?.organisationname || "");
+      setOrganisationId(data?.organisationid || "")
+    }
+  }, [session, isLoading, data, user, setName, setOrganisation,organisationid, setOrganisationId, setRole, setUsername, error, isError]);
+
+
+
+  if (isError) {
+    return <ErrorOccured message={(error as Error).message} />;
+  }
+  if(isLoading) {
+    return (<CircularProgressSpinner message="Loadding"/>)
+  }
   const handleClick = () => setOpen(!open);
   const handleToastClick = () => {
     setSuccessToastOpen(false);
@@ -61,53 +96,7 @@ export default function Home() {
     }
   };
 
-  const handleAddCompany = async (name: string) => {
-    setOpen(false);
-    const company: CompanyCreate = {
-      name: name,
-      userid: useremail,
-    };
-    try {
-      setIsSaving(true);
-      await createCompany(company);
-      setSuccessToastMessage("Organisation created successfully");
-      setSuccessToastOpen(true);
-    } catch (error) {
-      setErrorToastMessage((error as Error).message);
-      setErrorToastOpen(true);
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
-  const router = useRouter();
-
-  const fetchUser = () => getUserByEmail(useremail);
-
-  const { data, isError, isLoading, error } = useQuery(
-    [useremail],
-    fetchUser,
-    {
-      enabled: !!useremail,
-    }
-  );
-
-  useEffect(() => {
-    if (!isLoading) {
-      setUser(data)
-      setUsername(data?.useremail || "");
-      setName(data?.username || "");
-      setRole(data?.role || "");
-      setOrganisation(data?.organisationname || "");
-      setOrganisationId(data?.organisationid || "")
-    }
-  }, [session, isLoading, data, user, setName, setOrganisation, setOrganisationId, setRole, setUsername]);
-
-
-
-  if (isError) {
-    return <ErrorOccured message={(error as Error).message} />;
-  }
 
   return (
     <>
@@ -233,31 +222,18 @@ export default function Home() {
             </Box>
           </Container>
         }
-        {user && !user.organisationname && <>
-          <Typography
-            variant="h1"
-            sx={{
-              fontSize: '1.5em',
-              flexGrow: "1",
-            }}
-          >
-            {session?.user?.name}
-          </Typography>
-          <Box
-            textAlign="center"
-            color="text.secondary"
-            display='flex'
-            flexDirection="row"
-            width="100%"
-            sx={{ alignSelf: 'center', width: { sm: '100%', md: '80%' }, flexGrow: "1" }}
-          >
-            <Button onClick={() => setOpen(true)}>Create company</Button>
-
+        {!isSaving && user && !user.organisationname &&
+          <Box sx={pageContainer}>
+            <PageHeader message={`Welcome ${session?.user?.name}`} />
+            <Box sx={{ marginTop: "3vh" }}>
+              <Box sx={{padding:"6"}}>
+                <Typography sx={{textAlign:"center",fontSize:"1.4em",marginBottom:"4vh"}}>You dont appear to belong to any organisation</Typography>
+              </Box>
+              <Button fullWidth sx={{ backgroundColor: "blue", color: "white" }}><Link style={{width:"100%",textDecoration:"none",color:"white"}} href="/create-company">Register Organisation</Link></Button>
+            </Box>
           </Box>
-        </>
         }
 
-        <AddCompanyModal onAddCompany={handleAddCompany} open={open} onModalClose={handleClick} />
         <InviteMemberModal memberModalOpen={memberModalOpen} onInviteMember={handleInviteMember} onModalClose={handleMemberModalClick} />
       </Box>
 

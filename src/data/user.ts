@@ -23,8 +23,15 @@ export const AddUser = async (user: User) => {
 
 export const getUserByEmail = async (email: string | null | undefined) => {
   try {
-    const data = sql`SELECT a.id as userid,a.email as useremail, a.role as role, a.name as username,b.name ,b.name AS organisationname,b.id as organisationid FROM users a JOIN organisation b ON a.organisation::uuid = b.id WHERE email=${email}`;
-    return (await data).rows[0];
+    const data =
+      await sql`SELECT a.id as userid,a.email as useremail, a.role as role, a.name as username,b.name ,b.name AS organisationname,b.id as organisationid FROM users a JOIN organisation b ON a.organisation::uuid = b.id WHERE email=${email}`;
+    if (data.rowCount == 0) {
+      console.log("No org")
+      const data =
+        await sql`SELECT a.id as userid,a.email as useremail, role as role, a.name as username  FROM users a  WHERE email=${email}`;
+      return data.rows[0];
+    }
+    return data.rows[0];
   } catch (error) {
     throw new Error((error as Error).message);
   }

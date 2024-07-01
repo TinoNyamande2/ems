@@ -27,7 +27,7 @@ const defaultTheme = createTheme();
 export default function Page() {
   const [inputs, setInputs] = useState<User>(UserDefaultValues);
   const [formErrors, setFormErrors] = useState<User>(UserDefaultValues);
-  const { data: session } = useSession();
+  const { data: session,status } = useSession();
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
@@ -37,14 +37,13 @@ export default function Page() {
   const [errorMessageToastOpen, setErrorMessageToastOpen] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
   const [isLoadingOpen, setIsLoadingOpen] = useState(false);
-  const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get('redirectUrl') || "";
+  //const [count,setCount] = useState(0)
 
   useEffect(() => {
-    if (session) {
-      router.push(redirectUrl ? redirectUrl : "/");
+    if (status === "authenticated") {
+      router.push("/");
     }
-  }, [session, router, redirectUrl]);
+  }, [status, router]);
 
   const handleModalClick = () => {
     setPasswordModalOpen(!passwordModalOpen);
@@ -118,17 +117,19 @@ export default function Page() {
       });
 
       if (!response?.ok) {
+        console.log("ERror")
         throw new Error(response?.error ?? "An unknown error occurred");
       } else {
         setSuccessMessage("Logged in successfully");
         setSuccessMessageToastOpen(true);
-        router.push(redirectUrl ? redirectUrl : "/");
+        router.push("/");
       }
     } catch (error) {
       setErrorMessage((error as Error).message);
       setErrorMessageToastOpen(true);
     } finally {
       setIsLoadingOpen(false);
+      console.log(session?.user)
     }
   };
 
